@@ -1,0 +1,18 @@
+# Godot
+.godot/
+*.translation
+
+# .NET / C#
+bin/
+obj/
+.vs/
+*.user
+*.suo
+
+# OS / editor
+Thumbs.db
+Desktop.ini
+.DS_Store
+.idea/
+.vscode/
+*.swp
