@@ -1,0 +1,6 @@
+# Optional key remaps. Left-hand side is a source id, right-hand side is
+# the stable catalog key. Used by tools/dump_catalog.py.
+#
+# Strike: Strike_R
+# STRIKE_R: Strike_R
+# Burning Blood: BurningBlood

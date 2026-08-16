@@ -1,0 +1,51 @@
+{
+  "catalog_version": "synthetic-v0",
+  "game_version_string": "synthetic",
+  "note": "CI-only fake catalog. Not live Codex. SliceV0 names plus a few extras.",
+  "namespaces": {
+    "CARD": [
+      {"key": "Strike_R", "name": "Strike", "cost": 1, "rarity": "Basic", "type": "Attack"},
+      {"key": "Defend_R", "name": "Defend", "cost": 1, "rarity": "Basic", "type": "Skill"},
+      {"key": "Bash", "name": "Bash", "cost": 2, "rarity": "Basic", "type": "Attack"},
+      {"key": "Wound", "name": "Wound", "cost": -1, "rarity": "Status", "type": "Status"},
+      {"key": "AscendersBane", "name": "Ascender's Bane", "cost": -1, "rarity": "Curse", "type": "Curse"}
+    ],
+    "RELIC": [
+      {"key": "BurningBlood", "name": "Burning Blood"}
+    ],
+    "POTION": [
+      {"key": "FirePotion", "name": "Fire Potion"},
+      {"key": "BlockPotion", "name": "Block Potion"}
+    ],
+    "POWER": [
+      {"key": "Vulnerable", "name": "Vulnerable"},
+      {"key": "Weak", "name": "Weak"},
+      {"key": "Strength", "name": "Strength"},
+      {"key": "Dexterity", "name": "Dexterity"},
+      {"key": "Frail", "name": "Frail"},
+      {"key": "Poison", "name": "Poison"},
+      {"key": "Artifact", "name": "Artifact"},
+      {"key": "Buffer", "name": "Buffer"}
+    ],
+    "MONSTER": [
+      {"key": "TwoTailedRat", "name": "Two-Tailed Rat", "hp": 12, "max_hp": 13}
+    ],
+    "INTENT": [
+      {"key": "Attack", "name": "Attack"},
+      {"key": "Defend", "name": "Defend"},
+      {"key": "Buff", "name": "Buff"},
+      {"key": "Debuff", "name": "Debuff"},
+      {"key": "Unknown", "name": "Unknown"}
+    ],
+    "ENCOUNTER": [
+      {"key": "Act1_TwoTailedRats", "name": "Two-Tailed Rats"}
+    ],
+    "KEYWORD": [
+      {"key": "Exhaust"},
+      {"key": "Ethereal"},
+      {"key": "Retain"},
+      {"key": "Innate"},
+      {"key": "Unplayable"}
+    ]
+  }
+}

@@ -1,0 +1,619 @@
+{
+  "namespaces": {
+    "UNK": {
+      "value": 0,
+      "reserved_capacity": 8,
+      "unk": {
+        "key": "UNK",
+        "local_id": 0,
+        "entity_id": 0
+      },
+      "entries": []
+    },
+    "CARD": {
+      "value": 1,
+      "reserved_capacity": 8192,
+      "unk": {
+        "key": "UNK",
+        "local_id": 0,
+        "entity_id": 16777216
+      },
+      "entries": [
+        {
+          "key": "AscendersBane",
+          "local_id": 1,
+          "entity_id": 16777217,
+          "summary": {
+            "name": "Ascender's Bane",
+            "cost": -1,
+            "rarity": "Curse",
+            "type": "Curse"
+          }
+        },
+        {
+          "key": "Bash",
+          "local_id": 2,
+          "entity_id": 16777218,
+          "summary": {
+            "name": "Bash",
+            "cost": 2,
+            "rarity": "Basic",
+            "type": "Attack"
+          }
+        },
+        {
+          "key": "Defend_R",
+          "local_id": 3,
+          "entity_id": 16777219,
+          "summary": {
+            "name": "Defend",
+            "cost": 1,
+            "rarity": "Basic",
+            "type": "Skill"
+          }
+        },
+        {
+          "key": "Strike_R",
+          "local_id": 4,
+          "entity_id": 16777220,
+          "summary": {
+            "name": "Strike",
+            "cost": 1,
+            "rarity": "Basic",
+            "type": "Attack"
+          }
+        },
+        {
+          "key": "Wound",
+          "local_id": 5,
+          "entity_id": 16777221,
+          "summary": {
+            "name": "Wound",
+            "cost": -1,
+            "rarity": "Status",
+            "type": "Status"
+          }
+        }
+      ]
+    },
+    "RELIC": {
+      "value": 2,
+      "reserved_capacity": 2048,
+      "unk": {
+        "key": "UNK",
+        "local_id": 0,
+        "entity_id": 33554432
+      },
+      "entries": [
+        {
+          "key": "BurningBlood",
+          "local_id": 1,
+          "entity_id": 33554433,
+          "summary": {
+            "name": "Burning Blood"
+          }
+        }
+      ]
+    },
+    "POTION": {
+      "value": 3,
+      "reserved_capacity": 512,
+      "unk": {
+        "key": "UNK",
+        "local_id": 0,
+        "entity_id": 50331648
+      },
+      "entries": [
+        {
+          "key": "BlockPotion",
+          "local_id": 1,
+          "entity_id": 50331649,
+          "summary": {
+            "name": "Block Potion"
+          }
+        },
+        {
+          "key": "FirePotion",
+          "local_id": 2,
+          "entity_id": 50331650,
+          "summary": {
+            "name": "Fire Potion"
+          }
+        }
+      ]
+    },
+    "POWER": {
+      "value": 4,
+      "reserved_capacity": 2048,
+      "unk": {
+        "key": "UNK",
+        "local_id": 0,
+        "entity_id": 67108864
+      },
+      "entries": [
+        {
+          "key": "Artifact",
+          "local_id": 1,
+          "entity_id": 67108865,
+          "summary": {
+            "name": "Artifact"
+          }
+        },
+        {
+          "key": "Buffer",
+          "local_id": 2,
+          "entity_id": 67108866,
+          "summary": {
+            "name": "Buffer"
+          }
+        },
+        {
+          "key": "Dexterity",
+          "local_id": 3,
+          "entity_id": 67108867,
+          "summary": {
+            "name": "Dexterity"
+          }
+        },
+        {
+          "key": "Frail",
+          "local_id": 4,
+          "entity_id": 67108868,
+          "summary": {
+            "name": "Frail"
+          }
+        },
+        {
+          "key": "Poison",
+          "local_id": 5,
+          "entity_id": 67108869,
+          "summary": {
+            "name": "Poison"
+          }
+        },
+        {
+          "key": "Strength",
+          "local_id": 6,
+          "entity_id": 67108870,
+          "summary": {
+            "name": "Strength"
+          }
+        },
+        {
+          "key": "Vulnerable",
+          "local_id": 7,
+          "entity_id": 67108871,
+          "summary": {
+            "name": "Vulnerable"
+          }
+        },
+        {
+          "key": "Weak",
+          "local_id": 8,
+          "entity_id": 67108872,
+          "summary": {
+            "name": "Weak"
+          }
+        }
+      ]
+    },
+    "ORB": {
+      "value": 5,
+      "reserved_capacity": 64,
+      "unk": {
+        "key": "UNK",
+        "local_id": 0,
+        "entity_id": 83886080
+      },
+      "entries": []
+    },
+    "STANCE": {
+      "value": 6,
+      "reserved_capacity": 32,
+      "unk": {
+        "key": "UNK",
+        "local_id": 0,
+        "entity_id": 100663296
+      },
+      "entries": []
+    },
+    "MONSTER": {
+      "value": 7,
+      "reserved_capacity": 512,
+      "unk": {
+        "key": "UNK",
+        "local_id": 0,
+        "entity_id": 117440512
+      },
+      "entries": [
+        {
+          "key": "TwoTailedRat",
+          "local_id": 1,
+          "entity_id": 117440513,
+          "summary": {
+            "name": "Two-Tailed Rat",
+            "hp": 12,
+            "max_hp": 13
+          }
+        }
+      ]
+    },
+    "INTENT": {
+      "value": 8,
+      "reserved_capacity": 64,
+      "unk": {
+        "key": "UNK",
+        "local_id": 0,
+        "entity_id": 134217728
+      },
+      "entries": [
+        {
+          "key": "Attack",
+          "local_id": 1,
+          "entity_id": 134217729,
+          "summary": {
+            "name": "Attack"
+          }
+        },
+        {
+          "key": "Buff",
+          "local_id": 2,
+          "entity_id": 134217730,
+          "summary": {
+            "name": "Buff"
+          }
+        },
+        {
+          "key": "Debuff",
+          "local_id": 3,
+          "entity_id": 134217731,
+          "summary": {
+            "name": "Debuff"
+          }
+        },
+        {
+          "key": "Defend",
+          "local_id": 4,
+          "entity_id": 134217732,
+          "summary": {
+            "name": "Defend"
+          }
+        },
+        {
+          "key": "Unknown",
+          "local_id": 5,
+          "entity_id": 134217733,
+          "summary": {
+            "name": "Unknown"
+          }
+        }
+      ]
+    },
+    "EVENT": {
+      "value": 9,
+      "reserved_capacity": 256,
+      "unk": {
+        "key": "UNK",
+        "local_id": 0,
+        "entity_id": 150994944
+      },
+      "entries": []
+    },
+    "MAP_NODE": {
+      "value": 10,
+      "reserved_capacity": 32,
+      "unk": {
+        "key": "UNK",
+        "local_id": 0,
+        "entity_id": 167772160
+      },
+      "entries": [
+        {
+          "key": "$",
+          "local_id": 1,
+          "entity_id": 167772161
+        },
+        {
+          "key": "B",
+          "local_id": 2,
+          "entity_id": 167772162
+        },
+        {
+          "key": "E",
+          "local_id": 3,
+          "entity_id": 167772163
+        },
+        {
+          "key": "M",
+          "local_id": 4,
+          "entity_id": 167772164
+        },
+        {
+          "key": "Q",
+          "local_id": 5,
+          "entity_id": 167772165
+        },
+        {
+          "key": "R",
+          "local_id": 6,
+          "entity_id": 167772166
+        },
+        {
+          "key": "T",
+          "local_id": 7,
+          "entity_id": 167772167
+        }
+      ]
+    },
+    "STATUS_CARD": {
+      "value": 11,
+      "reserved_capacity": 64,
+      "unk": {
+        "key": "UNK",
+        "local_id": 0,
+        "entity_id": 184549376
+      },
+      "entries": []
+    },
+    "KEYWORD": {
+      "value": 12,
+      "reserved_capacity": 256,
+      "unk": {
+        "key": "UNK",
+        "local_id": 0,
+        "entity_id": 201326592
+      },
+      "entries": [
+        {
+          "key": "Ethereal",
+          "local_id": 1,
+          "entity_id": 201326593
+        },
+        {
+          "key": "Exhaust",
+          "local_id": 2,
+          "entity_id": 201326594
+        },
+        {
+          "key": "Innate",
+          "local_id": 3,
+          "entity_id": 201326595
+        },
+        {
+          "key": "Retain",
+          "local_id": 4,
+          "entity_id": 201326596
+        },
+        {
+          "key": "Unplayable",
+          "local_id": 5,
+          "entity_id": 201326597
+        }
+      ]
+    },
+    "ENCHANTMENT": {
+      "value": 13,
+      "reserved_capacity": 512,
+      "unk": {
+        "key": "UNK",
+        "local_id": 0,
+        "entity_id": 218103808
+      },
+      "entries": []
+    },
+    "AFFLICTION": {
+      "value": 14,
+      "reserved_capacity": 128,
+      "unk": {
+        "key": "UNK",
+        "local_id": 0,
+        "entity_id": 234881024
+      },
+      "entries": []
+    },
+    "ANCIENT": {
+      "value": 15,
+      "reserved_capacity": 16,
+      "unk": {
+        "key": "UNK",
+        "local_id": 0,
+        "entity_id": 251658240
+      },
+      "entries": []
+    },
+    "COMPANION": {
+      "value": 16,
+      "reserved_capacity": 16,
+      "unk": {
+        "key": "UNK",
+        "local_id": 0,
+        "entity_id": 268435456
+      },
+      "entries": []
+    },
+    "ENCOUNTER": {
+      "value": 17,
+      "reserved_capacity": 512,
+      "unk": {
+        "key": "UNK",
+        "local_id": 0,
+        "entity_id": 285212672
+      },
+      "entries": [
+        {
+          "key": "Act1_TwoTailedRats",
+          "local_id": 1,
+          "entity_id": 285212673,
+          "summary": {
+            "name": "Two-Tailed Rats"
+          }
+        }
+      ]
+    },
+    "SCREEN": {
+      "value": 18,
+      "reserved_capacity": 64,
+      "unk": {
+        "key": "UNK",
+        "local_id": 0,
+        "entity_id": 301989888
+      },
+      "entries": [
+        {
+          "key": "ANCIENT",
+          "local_id": 1,
+          "entity_id": 301989889
+        },
+        {
+          "key": "BOSS_RELIC",
+          "local_id": 2,
+          "entity_id": 301989890
+        },
+        {
+          "key": "CARD_DUPLICATE",
+          "local_id": 3,
+          "entity_id": 301989891
+        },
+        {
+          "key": "CARD_REMOVE",
+          "local_id": 4,
+          "entity_id": 301989892
+        },
+        {
+          "key": "CARD_REWARD",
+          "local_id": 5,
+          "entity_id": 301989893
+        },
+        {
+          "key": "CARD_SELECT_GRID",
+          "local_id": 6,
+          "entity_id": 301989894
+        },
+        {
+          "key": "CARD_TRANSFORM",
+          "local_id": 7,
+          "entity_id": 301989895
+        },
+        {
+          "key": "CARD_UPGRADE",
+          "local_id": 8,
+          "entity_id": 301989896
+        },
+        {
+          "key": "CHEST",
+          "local_id": 9,
+          "entity_id": 301989897
+        },
+        {
+          "key": "COMBAT",
+          "local_id": 10,
+          "entity_id": 301989898
+        },
+        {
+          "key": "COMBAT_REWARD",
+          "local_id": 11,
+          "entity_id": 301989899
+        },
+        {
+          "key": "ENCHANT",
+          "local_id": 12,
+          "entity_id": 301989900
+        },
+        {
+          "key": "EVENT",
+          "local_id": 13,
+          "entity_id": 301989901
+        },
+        {
+          "key": "GAME_OVER",
+          "local_id": 14,
+          "entity_id": 301989902
+        },
+        {
+          "key": "HAND_SELECT",
+          "local_id": 15,
+          "entity_id": 301989903
+        },
+        {
+          "key": "MAIN_MENU",
+          "local_id": 16,
+          "entity_id": 301989904
+        },
+        {
+          "key": "MAP",
+          "local_id": 17,
+          "entity_id": 301989905
+        },
+        {
+          "key": "NEOW",
+          "local_id": 18,
+          "entity_id": 301989906
+        },
+        {
+          "key": "NONE",
+          "local_id": 19,
+          "entity_id": 301989907
+        },
+        {
+          "key": "POTION_REWARD",
+          "local_id": 20,
+          "entity_id": 301989908
+        },
+        {
+          "key": "RELIC_REWARD",
+          "local_id": 21,
+          "entity_id": 301989909
+        },
+        {
+          "key": "REST",
+          "local_id": 22,
+          "entity_id": 301989910
+        },
+        {
+          "key": "SHOP",
+          "local_id": 23,
+          "entity_id": 301989911
+        },
+        {
+          "key": "TARGET_SELECT",
+          "local_id": 24,
+          "entity_id": 301989912
+        },
+        {
+          "key": "UNKNOWN",
+          "local_id": 25,
+          "entity_id": 301989913
+        },
+        {
+          "key": "VICTORY",
+          "local_id": 26,
+          "entity_id": 301989914
+        }
+      ]
+    },
+    "MODIFIER": {
+      "value": 19,
+      "reserved_capacity": 64,
+      "unk": {
+        "key": "UNK",
+        "local_id": 0,
+        "entity_id": 318767104
+      },
+      "entries": []
+    },
+    "GENERATED": {
+      "value": 20,
+      "reserved_capacity": 65536,
+      "unk": {
+        "key": "UNK",
+        "local_id": 0,
+        "entity_id": 335544320
+      },
+      "entries": []
+    }
+  },
+  "schema_version": 1,
+  "catalog_version": "synthetic-v0",
+  "game_version_string": "synthetic",
+  "source": "synthetic"
+}
