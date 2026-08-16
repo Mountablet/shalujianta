@@ -1,3 +1,19 @@
+# 游戏二进制与反编译（整棵 third_party 仅本机）
+third_party/
+**/sts2.dll
+**/decompiled/
+**/*.pck
+
+# 权重与游戏存档
+checkpoints/**/*.pt
+checkpoints/**/*.ckpt
+**/*.pt
+!python/tests/fixtures/tiny_random.pt
+*.run
+
+# 本机录音（可能含 Steam 路径 / 用户名）
+traces/real/
+
 # Godot
 .godot/
 *.translation
@@ -8,6 +24,21 @@ obj/
 .vs/
 *.user
 *.suo
+*.userosscache
+project.lock.json
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+dist/
+.coverage
+htmlcov/
 
 # OS / editor
 Thumbs.db
@@ -16,3 +47,8 @@ Desktop.ini
 .idea/
 .vscode/
 *.swp
+*~
+
+# 不要用 **/*.dll：会误伤以后自研 native addon。
+# Adapter 的 HintPath 必须指向本机游戏安装目录或环境变量 STS2_DLL，
+# 禁止仓库相对路径下的已提交二进制。

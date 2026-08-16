@@ -1,0 +1,49 @@
+# Source of truth for the legal + catalog CI.
+# Copy to .github/workflows/legal.yml after `gh auth refresh -s workflow`.
+name: legal
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  legal-scan:
+    name: scan repo and prove fixtures fail
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Scan repository (must be clean)
+        run: python tools/legal_scan.py --root .
+
+      - name: Prove scanner detects planted violations
+        run: python tools/legal_scan.py --self-test
+
+  catalog:
+    name: synthetic catalog only
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install test deps
+        run: python -m pip install -r requirements-dev.txt
+
+      - name: Dump synthetic catalog
+        run: python tools/dump_catalog.py --source synthetic --out catalog/generated
+
+      - name: Pytest catalog
+        run: python -m pytest python/tests/test_catalog.py
+        env:
+          SHALUJIANTA_ALLOW_LIVE_CODEX: ""
