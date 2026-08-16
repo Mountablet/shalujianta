@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Mountablet/shalujianta/proto/observation.schema.json",
+  "title": "ObservationV1",
+  "type": "object",
+  "required": ["schema_version", "catalog_version", "mode", "screen", "in_combat", "run"],
+  "additionalProperties": true,
+  "properties": {
+    "schema_version": { "type": "integer", "const": 1 },
+    "catalog_version": { "type": "string" },
+    "mode": { "type": "integer", "enum": [0, 1], "description": "0=NOSL 1=SL" },
+    "screen": { "type": "integer", "minimum": 0, "maximum": 63 },
+    "in_combat": { "type": "boolean" },
+    "run": { "type": "object" },
+    "combat": { "type": ["object", "null"] },
+    "selection": { "type": ["object", "null"] },
+    "legal": { "type": "object" },
+    "debug": { "type": ["object", "null"] }
+  }
+}

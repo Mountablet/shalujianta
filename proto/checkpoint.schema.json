@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Mountablet/shalujianta/proto/checkpoint.schema.json",
+  "title": "SimCheckpointV1",
+  "type": "object",
+  "description": "Placeholder for PR-003. Must include schema_version, catalog_version, game_version_string.",
+  "required": ["schema_version", "catalog_version", "game_version_string"],
+  "properties": {
+    "schema_version": { "type": "integer", "const": 1 },
+    "catalog_version": { "type": "string" },
+    "game_version_string": { "type": "string" }
+  }
+}

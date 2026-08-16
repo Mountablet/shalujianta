@@ -43,7 +43,7 @@ jobs:
       - name: Dump synthetic catalog
         run: python tools/dump_catalog.py --source synthetic --out catalog/generated
 
-      - name: Pytest catalog
-        run: python -m pytest python/tests/test_catalog.py
+      - name: Pytest
+        run: python -m pytest
         env:
           SHALUJIANTA_ALLOW_LIVE_CODEX: ""

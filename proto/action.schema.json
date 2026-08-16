@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Mountablet/shalujianta/proto/action.schema.json",
+  "title": "ActionV1",
+  "type": "object",
+  "required": ["verb"],
+  "additionalProperties": false,
+  "properties": {
+    "verb": { "type": "integer", "minimum": 0, "maximum": 32 },
+    "card_index": { "type": "integer" },
+    "card_uuid": { "type": "integer" },
+    "potion_slot": { "type": "integer" },
+    "target": {
+      "type": "object",
+      "properties": {
+        "kind": { "type": "integer", "minimum": 0, "maximum": 5 },
+        "index": { "type": "integer" }
+      },
+      "required": ["kind", "index"]
+    },
+    "option_index": { "type": "integer" },
+    "map_x": { "type": "integer" },
+    "map_y": { "type": "integer" },
+    "extra": { "type": "integer" }
+  }
+}
