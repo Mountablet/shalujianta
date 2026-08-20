@@ -47,3 +47,16 @@ jobs:
         run: python -m pytest
         env:
           SHALUJIANTA_ALLOW_LIVE_CODEX: ""
+
+  sim:
+    name: C# sim tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "9.0.x"
+      - name: Test
+        run: dotnet test src/Shalujianta.Sim.Tests/Shalujianta.Sim.Tests.csproj --nologo

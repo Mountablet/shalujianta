@@ -1,0 +1,22 @@
+{
+  "note": "STS2 seeds each System.Random as runSeed + hash(HashString) + ExtraOffset. Hash is StringHelper.GetDeterministicHashCode. Strings from tck.mn 2026-06-15 (v0.107.0). Re-check against live dll before changing defaults.",
+  "hash_algorithm": "StringHelper.GetDeterministicHashCode",
+  "streams": [
+    { "enum": "UpFront", "hash_string": "up_front", "extra_offset": 0 },
+    { "enum": "Shuffle", "hash_string": "shuffle", "extra_offset": 0 },
+    { "enum": "UnknownMapPoint", "hash_string": "unknown_map_point", "extra_offset": 0 },
+    { "enum": "CombatCardGeneration", "hash_string": "combat_card_generation", "extra_offset": 0 },
+    { "enum": "CombatPotionGeneration", "hash_string": "combat_potion_generation", "extra_offset": 0 },
+    { "enum": "CombatCardSelection", "hash_string": "combat_card_selection", "extra_offset": 0 },
+    { "enum": "CombatEnergyCosts", "hash_string": "combat_energy_costs", "extra_offset": 0 },
+    { "enum": "CombatTargets", "hash_string": "combat_targets", "extra_offset": 0 },
+    { "enum": "MonsterAi", "hash_string": "monster_ai", "extra_offset": 0 },
+    { "enum": "Niche", "hash_string": "niche", "extra_offset": 0 },
+    { "enum": "CombatOrbGeneration", "hash_string": "combat_orbs", "extra_offset": 0 },
+    { "enum": "TreasureRoomRelics", "hash_string": "treasure_room_relics", "extra_offset": 0 },
+    { "enum": "Neow", "hash_string": "NEOW", "extra_offset": 1 },
+    { "enum": "EventBase", "hash_string": "event_base", "extra_offset": 0 },
+    { "enum": "Custom0", "hash_string": "custom_0", "extra_offset": 0 },
+    { "enum": "Custom1", "hash_string": "custom_1", "extra_offset": 0 }
+  ]
+}

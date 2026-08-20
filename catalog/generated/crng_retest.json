@@ -1,0 +1,10 @@
+{
+  "date": "2026-08-15",
+  "dotnet_sdk": "9.0",
+  "compat_matches_seeded_system_random": true,
+  "linear_seed_correlation_in_compat": true,
+  "game_sts2_dll_retest": "not_run_ci_forbids_dll",
+  "default_backend": "SystemRandomLegacy",
+  "switch_to_pcg32": false,
+  "note": "Pinned SystemRandomCompat still matches seeded BCL Random and is linear in abs(seed), i.e. CRNG still exists in the algorithm. Live STS2 may have switched after tck.mn 2026-06-15; Adapter/parity (post-v0) must re-check the installed build. Until then v0 default remains SystemRandomLegacy. Set RngBackendKind.Pcg32 in SimConfig when dll confirms a replacement."
+}

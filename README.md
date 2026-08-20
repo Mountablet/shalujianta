@@ -11,6 +11,7 @@ Slay the Spire 2 的打牌 AI：无头模拟器 + 局内策略 + 局外搜索。
 - **PR-000**：仓库骨架与法律扫描
 - **PR-001**：EntityId 命名空间 + `tools/dump_catalog.py`（默认只读合成目录）
 - **PR-002**：`ObservationV1` / `ActionV1` + NoSL 投影 + 256 槽展开表
+- **PR-003**：钉死的 `System.Random` 兼容实现、RNG 流哈希表、`SimCheckpoint`
 
 已锁定：
 
@@ -36,6 +37,7 @@ python tools/legal_scan.py --self-test
 python -m pip install -r requirements-dev.txt
 python tools/dump_catalog.py
 python -m pytest
+dotnet test src/Shalujianta.Sim.Tests/Shalujianta.Sim.Tests.csproj
 ```
 
 GitHub Actions 工作流源文件在 `tools/ci/legal.yml`。要启用线上 CI，需要给 `gh` 补 `workflow` 权限后再把该文件复制到 `.github/workflows/legal.yml`。
