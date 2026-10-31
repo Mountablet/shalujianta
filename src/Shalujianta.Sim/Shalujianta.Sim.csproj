@@ -6,4 +6,8 @@
     <LangVersion>latest</LangVersion>
     <RootNamespace>Shalujianta.Sim</RootNamespace>
   </PropertyGroup>
+  <ItemGroup>
+    <!-- Action (the protocol struct) wins over System.Action everywhere in this project. -->
+    <Using Include="Shalujianta.Sim.Core.Action" Alias="Action" />
+  </ItemGroup>
 </Project>

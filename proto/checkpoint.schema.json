@@ -33,6 +33,10 @@
     "rng_state_base64": { "type": "string" },
     "turn": { "type": "integer" },
     "combat_id": { "type": "integer" },
-    "encounter_id": { "type": "integer" }
+    "encounter_id": { "type": "integer" },
+    "combat": {
+      "type": ["object", "null"],
+      "description": "Live combat state (CombatSnapshot); absent for run-level checkpoints outside combat"
+    }
   }
 }

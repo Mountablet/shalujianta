@@ -12,6 +12,7 @@ Slay the Spire 2 的打牌 AI：无头模拟器 + 局内策略 + 局外搜索。
 - **PR-001**：EntityId 命名空间 + `tools/dump_catalog.py`（默认只读合成目录）
 - **PR-002**：`ObservationV1` / `ActionV1` + NoSL 投影 + 256 槽展开表
 - **PR-003**：钉死的 `System.Random` 兼容实现、RNG 流哈希表、`SimCheckpoint`
+- **PR-004**：战斗内核与回合机（`CombatWorld`：BattleStart 不抽牌、每回合 TurnStart 抽 5、END_TURN 内敌方、手牌上限 10、0 费硬切、SL Clone/Checkpoint/双哈希）
 
 已锁定：
 

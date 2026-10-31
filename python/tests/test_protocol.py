@@ -268,11 +268,14 @@ def test_checkpoint_schema_covers_sim_checkpoint_properties() -> None:
     cs_text = (
         ROOT / "src" / "Shalujianta.Sim" / "Core" / "SimCheckpoint.cs"
     ).read_text(encoding="utf-8")
+    # Only the SimCheckpoint class body; the *Snapshot DTOs below it are sub-objects
+    # described by the "combat" property, not top-level checkpoint keys.
+    head = cs_text.split("sealed class CombatSnapshot")[0]
     schema = json.loads(
         (ROOT / "proto" / "checkpoint.schema.json").read_text(encoding="utf-8")
     )
     props = set(schema["properties"])
-    names = re.findall(r"public [A-Za-z0-9_]+ (\w+) \{ get; set; \}", cs_text)
+    names = re.findall(r"public [A-Za-z0-9_]+ (\w+) \{ get; set; \}", head)
     assert names, "property scan found nothing; regex drifted from SimCheckpoint.cs"
     for name in names:
         snake = re.sub(r"(?<!^)(?=[A-Z])", "_", name).lower()
