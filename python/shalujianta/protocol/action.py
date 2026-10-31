@@ -19,6 +19,9 @@ from shalujianta.protocol.constants import (
     PROCEED_SLOT,
     REST_BASE,
     SHOP_BASE,
+    SHOP_BUY_COUNT,
+    SHOP_LEAVE_SLOT,
+    SHOP_REMOVE_SLOT,
     SKIP_SLOT,
     TARGET_ALL_ENEMIES,
     TARGET_COMPANION,
@@ -28,7 +31,7 @@ from shalujianta.protocol.constants import (
     TARGET_RANDOM_ENEMY,
     USE_POTION_BASE,
 )
-from shalujianta.protocol.enums import Verb
+from shalujianta.protocol.enums import ScreenType, Verb
 
 
 @dataclass(slots=True)
@@ -126,10 +129,14 @@ def action_to_flat(action: Action) -> int:
         if not 0 <= action.option_index < 6:
             raise ValueError("REST_CHOOSE option_index 0..5")
         return REST_BASE + action.option_index
-    if verb in (Verb.SHOP_BUY, Verb.SHOP_REMOVE, Verb.SHOP_LEAVE):
-        if not 0 <= action.option_index < 16:
-            raise ValueError("shop option_index 0..15")
+    if verb == Verb.SHOP_BUY:
+        if not 0 <= action.option_index < SHOP_BUY_COUNT:
+            raise ValueError(f"SHOP_BUY option_index 0..{SHOP_BUY_COUNT - 1}")
         return SHOP_BASE + action.option_index
+    if verb == Verb.SHOP_REMOVE:
+        return SHOP_REMOVE_SLOT
+    if verb == Verb.SHOP_LEAVE:
+        return SHOP_LEAVE_SLOT
     if verb in (Verb.EVENT_OPTION, Verb.NEOW_PICK, Verb.ANCIENT_PICK):
         if not 0 <= action.option_index < 8:
             raise ValueError("event-like option_index 0..7")
@@ -151,7 +158,21 @@ def action_to_flat(action: Action) -> int:
     raise ValueError(f"verb {verb.name} is not in the 256-slot table")
 
 
-def flat_to_action(slot: int, *, companion_slot8: bool = False) -> Action:
+# Slots 183-190 are shared by EVENT_OPTION / NEOW_PICK / ANCIENT_PICK; the
+# three verbs never coexist on one screen, so decode needs the screen context.
+_EVENT_SCREEN_VERB = {
+    int(ScreenType.EVENT): Verb.EVENT_OPTION,
+    int(ScreenType.NEOW): Verb.NEOW_PICK,
+    int(ScreenType.ANCIENT): Verb.ANCIENT_PICK,
+}
+
+
+def flat_to_action(
+    slot: int,
+    *,
+    companion_slot8: bool = False,
+    event_screen: int = ScreenType.EVENT,
+) -> Action:
     if not 0 <= slot < FLAT_SIZE:
         raise ValueError(f"flat slot out of range: {slot}")
     if slot < USE_POTION_BASE:
@@ -184,10 +205,15 @@ def flat_to_action(slot: int, *, companion_slot8: bool = False) -> Action:
         return Action(verb=Verb.CARD_REWARD_PICK, option_index=rel)
     if slot < SHOP_BASE:
         return Action(verb=Verb.REST_CHOOSE, option_index=slot - REST_BASE)
+    if slot == SHOP_REMOVE_SLOT:
+        return Action(verb=Verb.SHOP_REMOVE)
+    if slot == SHOP_LEAVE_SLOT:
+        return Action(verb=Verb.SHOP_LEAVE)
     if slot < EVENT_BASE:
         return Action(verb=Verb.SHOP_BUY, option_index=slot - SHOP_BASE)
     if slot < BOSS_RELIC_BASE:
-        return Action(verb=Verb.EVENT_OPTION, option_index=slot - EVENT_BASE)
+        verb = _EVENT_SCREEN_VERB.get(event_screen, Verb.EVENT_OPTION)
+        return Action(verb=verb, option_index=slot - EVENT_BASE)
     if slot < CHOOSE_BASE:
         rel = slot - BOSS_RELIC_BASE
         if rel == 3:

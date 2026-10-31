@@ -1,3 +1,4 @@
+using Shalujianta.Sim.Codec;
 using Shalujianta.Sim.Core;
 using Xunit;
 
@@ -71,6 +72,22 @@ public sealed class RngTests
         Assert.Equal(rng.NextInt(RngStream.Shuffle, 10), restored.NextInt(RngStream.Shuffle, 10));
         Assert.Equal(rng.Counter(RngStream.MonsterAi), restored.Counter(RngStream.MonsterAi));
         Assert.Equal(ckpt.Hash64(), SimCheckpoint.FromJson(json).Hash64());
+    }
+
+    [Fact]
+    public void CheckpointJsonSerializesEnumsAsIntegers()
+    {
+        // Must match the Python codec and proto/checkpoint.schema.json:
+        // mode 0=NOSL 1=SL, rng_kind 0=SystemRandomLegacy 1=Pcg32.
+        var rng = new MultiRng();
+        rng.Seed(5);
+        var ckpt = SimCheckpoint.Capture(rng, catalogVersion: "synthetic-v0", gameVersion: "sts2-unverified");
+        ckpt.Mode = InfoMode.Sl;
+        string json = ckpt.ToJson();
+        Assert.Contains("\"mode\": 1", json);
+        Assert.Contains("\"rng_kind\": 0", json);
+        Assert.DoesNotContain("\"Sl\"", json);
+        Assert.DoesNotContain("\"SystemRandomLegacy\"", json);
     }
 
     [Fact]

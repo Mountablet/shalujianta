@@ -83,9 +83,12 @@ def project_observation(obs: Observation, mode: InfoMode) -> Observation:
         out.combat.next_shuffle_revealed = False
         out.combat.rng_counters = {}
         bag: dict[int, int] = {}
-        # bag is already on the object; keep it. If empty, rebuild from remaining unknown.
+        # bag is already on the object; keep it. If empty, rebuild it from the
+        # unknown remainder only: bag total + known cards must equal draw_size.
         if not out.combat.draw_bag_counts:
             for card in obs.combat.draw_pile if obs.combat else []:
+                if card.known_in_draw:
+                    continue
                 bag[card.catalog_id] = bag.get(card.catalog_id, 0) + 1
             out.combat.draw_bag_counts = sorted(bag.items())
         for monster in out.combat.monsters:

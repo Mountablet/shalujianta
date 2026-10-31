@@ -3,11 +3,36 @@
   "$id": "https://github.com/Mountablet/shalujianta/proto/checkpoint.schema.json",
   "title": "SimCheckpointV1",
   "type": "object",
-  "description": "Placeholder for PR-003. Must include schema_version, catalog_version, game_version_string.",
-  "required": ["schema_version", "catalog_version", "game_version_string"],
+  "description": "SimCheckpoint JSON as serialized by src/Shalujianta.Sim/Core/SimCheckpoint.cs: snake_case keys, enums as integers to match ObservationV1/ActionV1. rng_state_base64 carries full RNG stream internals; it is simulator-only and must never reach a NoSL agent or the training batch.",
+  "required": [
+    "schema_version",
+    "catalog_version",
+    "game_version_string",
+    "run_seed_i32",
+    "mode",
+    "rng_kind",
+    "rng_state_base64"
+  ],
+  "additionalProperties": true,
   "properties": {
     "schema_version": { "type": "integer", "const": 1 },
     "catalog_version": { "type": "string" },
-    "game_version_string": { "type": "string" }
+    "game_version_string": { "type": "string" },
+    "run_seed_i32": { "type": "integer" },
+    "character_id": { "type": "integer" },
+    "ascension": { "type": "integer" },
+    "floor": { "type": "integer" },
+    "act": { "type": "integer" },
+    "act_variant": { "type": "integer" },
+    "mode": { "type": "integer", "enum": [0, 1], "description": "0=NOSL 1=SL" },
+    "rng_kind": {
+      "type": "integer",
+      "enum": [0, 1],
+      "description": "0=SystemRandomLegacy 1=Pcg32"
+    },
+    "rng_state_base64": { "type": "string" },
+    "turn": { "type": "integer" },
+    "combat_id": { "type": "integer" },
+    "encounter_id": { "type": "integer" }
   }
 }

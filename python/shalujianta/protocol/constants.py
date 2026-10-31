@@ -35,8 +35,13 @@ REST_BASE = 161
 REST_COUNT = 6
 SHOP_BASE = 167
 SHOP_COUNT = 16
+# Shop region (167-182) is serialized: one atomic action per slot, per design §4.9.
+# BUY occupies 14 slots (items 0..13), then one REMOVE and one LEAVE slot.
+SHOP_BUY_COUNT = 14
+SHOP_REMOVE_SLOT = 181  # SHOP_BASE + 14
+SHOP_LEAVE_SLOT = 182  # SHOP_BASE + 15
 EVENT_BASE = 183
-EVENT_COUNT = 8
+EVENT_COUNT = 8  # shared by EVENT_OPTION / NEOW_PICK / ANCIENT_PICK via screen context
 BOSS_RELIC_BASE = 191
 BOSS_RELIC_COUNT = 4
 CHOOSE_BASE = 195

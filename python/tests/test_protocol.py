@@ -29,10 +29,15 @@ from shalujianta.protocol.constants import (
     COMBAT_FLAT_END,
     DISCARD_POTION_BASE,
     END_TURN_SLOT,
+    EVENT_BASE,
     FLAT_SIZE,
     PLAY_CARD_BASE,
     PLAY_CARD_COUNT,
     SCHEMA_VERSION,
+    SHOP_BASE,
+    SHOP_BUY_COUNT,
+    SHOP_LEAVE_SLOT,
+    SHOP_REMOVE_SLOT,
     TARGET_ALL_ENEMIES,
     TARGET_MONSTER,
     TARGET_NONE,
@@ -203,6 +208,19 @@ def test_project_nosl_does_not_mutate_original() -> None:
     assert sl.debug is not None
 
 
+def test_nosl_bag_counts_only_unknown_cards() -> None:
+    # _leaky_sl_obs draw pile: 2 unknown + 1 known card, draw_size == 3.
+    sl = _leaky_sl_obs()
+    nosl = project_observation(sl, InfoMode.NOSL)
+    combat = nosl.combat
+    assert combat is not None
+    bag_total = sum(count for _, count in combat.draw_bag_counts)
+    known_total = len(combat.draw_pile)
+    assert known_total == 1
+    assert bag_total == 2
+    assert bag_total + known_total == combat.draw_size
+
+
 def test_observation_dict_round_trip_public_fields() -> None:
     sl = _leaky_sl_obs()
     data = observation_to_dict(sl, mode=InfoMode.NOSL)
@@ -213,6 +231,30 @@ def test_observation_dict_round_trip_public_fields() -> None:
     assert "rng_counters" not in data["combat"]
 
 
+def test_shop_region_is_serialized_per_slot() -> None:
+    # Design §4.9: slots 167-182 are one atomic action each —
+    # BUY items 0..13, then REMOVE and LEAVE.
+    assert action_to_flat(Action(verb=Verb.SHOP_BUY, option_index=5)) == SHOP_BASE + 5
+    assert action_to_flat(Action(verb=Verb.SHOP_REMOVE)) == SHOP_REMOVE_SLOT
+    assert action_to_flat(Action(verb=Verb.SHOP_LEAVE)) == SHOP_LEAVE_SLOT
+    assert flat_to_action(SHOP_BASE + 5).verb == Verb.SHOP_BUY
+    assert flat_to_action(SHOP_REMOVE_SLOT).verb == Verb.SHOP_REMOVE
+    assert flat_to_action(SHOP_LEAVE_SLOT).verb == Verb.SHOP_LEAVE
+    with pytest.raises(ValueError):
+        action_to_flat(Action(verb=Verb.SHOP_BUY, option_index=SHOP_BUY_COUNT))
+
+
+def test_event_region_verb_follows_screen_context() -> None:
+    # Slots 183-190 are shared by EVENT_OPTION / NEOW_PICK / ANCIENT_PICK;
+    # they never coexist on one screen, so decode takes the screen as context.
+    slot = EVENT_BASE + 2
+    for verb in (Verb.EVENT_OPTION, Verb.NEOW_PICK, Verb.ANCIENT_PICK):
+        assert action_to_flat(Action(verb=verb, option_index=2)) == slot
+    assert flat_to_action(slot).verb == Verb.EVENT_OPTION
+    assert flat_to_action(slot, event_screen=ScreenType.NEOW).verb == Verb.NEOW_PICK
+    assert flat_to_action(slot, event_screen=ScreenType.ANCIENT).verb == Verb.ANCIENT_PICK
+
+
 def test_json_schemas_exist_and_mention_mode() -> None:
     obs_schema = json.loads((ROOT / "proto" / "observation.schema.json").read_text(encoding="utf-8"))
     act_schema = json.loads((ROOT / "proto" / "action.schema.json").read_text(encoding="utf-8"))
@@ -220,6 +262,21 @@ def test_json_schemas_exist_and_mention_mode() -> None:
     assert "mode" in obs_schema["properties"]
     assert act_schema["title"] == "ActionV1"
     assert "verb" in act_schema["properties"]
+
+
+def test_checkpoint_schema_covers_sim_checkpoint_properties() -> None:
+    cs_text = (
+        ROOT / "src" / "Shalujianta.Sim" / "Core" / "SimCheckpoint.cs"
+    ).read_text(encoding="utf-8")
+    schema = json.loads(
+        (ROOT / "proto" / "checkpoint.schema.json").read_text(encoding="utf-8")
+    )
+    props = set(schema["properties"])
+    names = re.findall(r"public [A-Za-z0-9_]+ (\w+) \{ get; set; \}", cs_text)
+    assert names, "property scan found nothing; regex drifted from SimCheckpoint.cs"
+    for name in names:
+        snake = re.sub(r"(?<!^)(?=[A-Z])", "_", name).lower()
+        assert snake in props, f"checkpoint schema is missing C# property {name} ({snake})"
 
 
 def test_csharp_flatten_constants_match_python() -> None:

@@ -1,5 +1,4 @@
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using Shalujianta.Sim.Codec;
 
 namespace Shalujianta.Sim.Core;
@@ -72,10 +71,11 @@ public sealed class SimCheckpoint
         return h;
     }
 
+    // Enums serialize as integers so the JSON matches the Python codec and
+    // proto/*.schema.json (mode: 0=NOSL 1=SL, rng_kind: 0=SystemRandomLegacy 1=Pcg32).
     private static readonly JsonSerializerOptions JsonOpts = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
         WriteIndented = true,
-        Converters = { new JsonStringEnumConverter() },
     };
 }
