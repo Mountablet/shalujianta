@@ -1,0 +1,16 @@
+{
+  "suite": "v0_first_fight",
+  "policy": "random_policy",
+  "mode": "NOSL",
+  "encounter": "Act1_TwoTailedRats",
+  "n": 100,
+  "seed_base": 0,
+  "win_rate": 1.0,
+  "avg_hp_frac": 0.79475,
+  "avg_turns": 5.18,
+  "avg_reward": 1.2042874997939998,
+  "died_with_lethal_potion": 0,
+  "stall_cut_rate": 0.0,
+  "illegal_action_rate": 0.0,
+  "wall_clock_s": 0.33
+}

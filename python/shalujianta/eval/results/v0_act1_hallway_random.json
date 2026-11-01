@@ -1,0 +1,12 @@
+{
+  "suite": "v0_act1_hallway",
+  "policy": "random_policy",
+  "mode": "NOSL",
+  "n": 100,
+  "length": 3,
+  "suite_win_rate": 0.88,
+  "avg_final_hp_frac": 0.35700000000000004,
+  "died_with_lethal_potion": 0,
+  "illegal_action_rate": 0.0,
+  "wall_clock_s": 0.85
+}
