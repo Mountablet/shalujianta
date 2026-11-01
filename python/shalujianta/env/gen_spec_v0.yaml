@@ -1,0 +1,13 @@
+# GenSpecV0 (design 5.1). Flat key: value file on purpose — CI has no yaml dep.
+# Procedural generation is DISABLED until PR-005b widens the hallway pool;
+# StarterGenerator.procedural() raises GenRejectExhausted while this stays false.
+source: starter
+procedural_enabled: false
+encounter: Act1_TwoTailedRats
+character: Ironclad
+act_variant_bernoulli: 0.5      # documented default prior, not measured
+deck_sizes: 10-16               # procedural only (off)
+upgrade_rate_bernoulli: 0.08    # procedural only (off)
+hp_full: 80
+gold_constant: 99               # unverified STS2 opening gold; PR-005+ checks vs dll
+potion_slots: 3

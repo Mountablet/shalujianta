@@ -26,7 +26,9 @@ public sealed class CombatStart
     public int CharacterId { get; init; }
     public int Floor { get; init; } = 1;
     public int EncounterId { get; init; }
-    public int PlayerHp { get; init; } = -1;
+
+    /// <summary>Starting HP; -1 means full. Mutable so generators can set the carried HP.</summary>
+    public int PlayerHp { get; set; } = -1;
     public int PlayerMaxHp { get; init; } = 80;
     public int MaxEnergy { get; init; } = CombatRules.DefaultMaxEnergy;
 

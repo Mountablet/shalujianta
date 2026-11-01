@@ -166,15 +166,17 @@ class CombatEnv:
     def reset(self, seed: int | None = None, options: dict[str, Any] | None = None) -> tuple[dict[str, Any], dict[str, Any]]:
         if self._handle is not None:
             self._handle.close()
-        resp = self._bridge.request(
-            {
-                "cmd": "new",
-                "seed": int(seed) if seed is not None else 0,
-                "encounter": self._encounter,
-                "mode": "SL" if self._mode == InfoMode.SL else "NOSL",
-                "stall_turn_limit": self._stall,
-            }
-        )
+        options = options or {}
+        payload: dict[str, Any] = {
+            "cmd": "new",
+            "seed": int(seed) if seed is not None else 0,
+            "encounter": options.get("encounter", self._encounter),
+            "mode": "SL" if self._mode == InfoMode.SL else "NOSL",
+            "stall_turn_limit": self._stall,
+        }
+        if options.get("player_hp") is not None:
+            payload["player_hp"] = int(options["player_hp"])  # hallway HP carry (PR-009)
+        resp = self._bridge.request(payload)
         self._handle = _WorldHandle(self._bridge, resp["handle"])
         obs = self._handle._absorb(resp["obs"])
         return obs, {"handle": resp["handle"], "mode": resp["mode"]}

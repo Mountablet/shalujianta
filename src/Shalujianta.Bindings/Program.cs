@@ -117,6 +117,11 @@ public static class Program
             StallTurnLimit = stall,
         };
         var start = SliceV0.StarterCombat(kind);
+        if (req.TryGetProperty("player_hp", out var ph))
+        {
+            start.PlayerHp = ph.GetInt32(); // hallway HP carry (PR-009)
+        }
+
         var world = new CombatWorld(cfg, start, seed);
         world.Start();
 
