@@ -18,6 +18,20 @@ public static class PowerIds
     public const int Shrink = 0x0400000A;
     public const int Slippery = 0x0400000B;
     public const int Tangled = 0x0400000C;
+    public const int HardenedShell = 0x0400000D;
+    public const int Intangible = 0x0400000E;
+    public const int Plating = 0x0400000F;
+    public const int Ritual = 0x04000010;
+    public const int Skittish = 0x04000011;
+    public const int Slow = 0x04000012;
+    public const int SteamEruption = 0x04000013;
+    public const int Suck = 0x04000014;
+    public const int Territorial = 0x04000015;
+    public const int Thorns = 0x04000016;
+    public const int Vigor = 0x04000017;
+    public const int Asleep = 0x04000018;
+    public const int Smoggy = 0x04000019;
+    public const int Ringing = 0x0400001A;
 }
 
 public readonly record struct PowerStack(int CatalogId, int Amount, bool JustApplied);
@@ -47,16 +61,27 @@ public static class PowerOps
         {
             if (powers[i].CatalogId == catalogId)
             {
-                powers[i] = powers[i] with
+                int total = powers[i].Amount + amount;
+                if (total <= 0)
                 {
-                    Amount = powers[i].Amount + amount,
-                    JustApplied = powers[i].JustApplied | justApplied,
-                };
+                    powers.RemoveAt(i); // Soul Siphon-style negative stacks remove the row
+                }
+                else
+                {
+                    powers[i] = powers[i] with
+                    {
+                        Amount = total,
+                        JustApplied = powers[i].JustApplied | justApplied,
+                    };
+                }
                 return;
             }
         }
 
-        powers.Add(new PowerStack(catalogId, amount, justApplied));
+        if (amount > 0)
+        {
+            powers.Add(new PowerStack(catalogId, amount, justApplied));
+        }
     }
 
     public static bool Remove(List<PowerStack> powers, int catalogId)
@@ -130,7 +155,7 @@ public static class PowerOps
     }
 
     private static bool IsDecayable(int catalogId) =>
-        catalogId is PowerIds.Vulnerable or PowerIds.Weak or PowerIds.Frail or PowerIds.Tangled;
+        catalogId is PowerIds.Vulnerable or PowerIds.Weak or PowerIds.Frail or PowerIds.Tangled or PowerIds.Intangible;
 }
 
 /// <summary>
@@ -140,7 +165,7 @@ public static class PowerOps
 /// </summary>
 public static class DamageMath
 {
-    public static int Outgoing(int baseDamage, List<PowerStack> attacker, List<PowerStack> defender)
+    public static int Outgoing(int baseDamage, List<PowerStack> attacker, List<PowerStack> defender, int defenderSlowStacks = 0)
     {
         float d = baseDamage + PowerOps.GetAmount(attacker, PowerIds.Strength);
         if (PowerOps.HasPower(defender, PowerIds.Vulnerable))
@@ -156,6 +181,11 @@ public static class DamageMath
         if (PowerOps.HasPower(attacker, PowerIds.Shrink))
         {
             d *= CombatRules.ShrinkMultiplier;
+        }
+
+        if (defenderSlowStacks > 0)
+        {
+            d *= 1f + 0.1f * defenderSlowStacks; // Bygone Effigy: +10% per card played
         }
 
         return (int)MathF.Floor(d);
@@ -175,5 +205,6 @@ public static class DamageMath
     /// <summary>Debuffs an Artifact holder can absorb (Poison stored but not ticked in v0).</summary>
     public static bool IsDebuff(int catalogId) =>
         catalogId is PowerIds.Vulnerable or PowerIds.Weak or PowerIds.Frail or PowerIds.Poison
-            or PowerIds.Shrink or PowerIds.Tangled or PowerIds.Constrict or PowerIds.Slippery;
+            or PowerIds.Shrink or PowerIds.Tangled or PowerIds.Constrict or PowerIds.Slippery
+            or PowerIds.Slow;
 }

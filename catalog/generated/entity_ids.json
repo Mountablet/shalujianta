@@ -84,6 +84,39 @@
             "rarity": "Status",
             "type": "Status"
           }
+        },
+        {
+          "key": "Beckon",
+          "local_id": 7,
+          "entity_id": 16777223,
+          "summary": {
+            "name": "Beckon",
+            "cost": -1,
+            "rarity": "Status",
+            "type": "Status"
+          }
+        },
+        {
+          "key": "Dazed",
+          "local_id": 8,
+          "entity_id": 16777224,
+          "summary": {
+            "name": "Dazed",
+            "cost": -1,
+            "rarity": "Status",
+            "type": "Status"
+          }
+        },
+        {
+          "key": "Infection",
+          "local_id": 9,
+          "entity_id": 16777225,
+          "summary": {
+            "name": "Infection",
+            "cost": -1,
+            "rarity": "Status",
+            "type": "Status"
+          }
         }
       ]
     },
@@ -237,6 +270,76 @@
           "summary": {
             "name": "Tangled"
           }
+        },
+        {
+          "key": "HardenedShell",
+          "local_id": 13,
+          "entity_id": 67108877
+        },
+        {
+          "key": "Intangible",
+          "local_id": 14,
+          "entity_id": 67108878
+        },
+        {
+          "key": "Plating",
+          "local_id": 15,
+          "entity_id": 67108879
+        },
+        {
+          "key": "Ritual",
+          "local_id": 16,
+          "entity_id": 67108880
+        },
+        {
+          "key": "Skittish",
+          "local_id": 17,
+          "entity_id": 67108881
+        },
+        {
+          "key": "Slow",
+          "local_id": 18,
+          "entity_id": 67108882
+        },
+        {
+          "key": "SteamEruption",
+          "local_id": 19,
+          "entity_id": 67108883
+        },
+        {
+          "key": "Suck",
+          "local_id": 20,
+          "entity_id": 67108884
+        },
+        {
+          "key": "Territorial",
+          "local_id": 21,
+          "entity_id": 67108885
+        },
+        {
+          "key": "Thorns",
+          "local_id": 22,
+          "entity_id": 67108886
+        },
+        {
+          "key": "Vigor",
+          "local_id": 23,
+          "entity_id": 67108887
+        },
+        {
+          "key": "Asleep",
+          "local_id": 24,
+          "entity_id": 67108888
+        },
+        {
+          "key": "Ringing",
+          "local_id": 25,
+          "entity_id": 67108889
+        },
+        {
+          "key": "Smoggy",
+          "local_id": 26,
+          "entity_id": 67108890
         }
       ]
     },
@@ -398,6 +501,156 @@
           "summary": {
             "name": "Vine Shambler"
           }
+        },
+        {
+          "key": "AssassinRaider",
+          "local_id": 17,
+          "entity_id": 117440529
+        },
+        {
+          "key": "AxeRaider",
+          "local_id": 18,
+          "entity_id": 117440530
+        },
+        {
+          "key": "BruteRaider",
+          "local_id": 19,
+          "entity_id": 117440531
+        },
+        {
+          "key": "BygoneEffigy",
+          "local_id": 20,
+          "entity_id": 117440532
+        },
+        {
+          "key": "Byrdonis",
+          "local_id": 21,
+          "entity_id": 117440533
+        },
+        {
+          "key": "CalcifiedCultist",
+          "local_id": 22,
+          "entity_id": 117440534
+        },
+        {
+          "key": "CeremonialBeast",
+          "local_id": 23,
+          "entity_id": 117440535
+        },
+        {
+          "key": "CorpseSlug",
+          "local_id": 24,
+          "entity_id": 117440536
+        },
+        {
+          "key": "CrossbowRaider",
+          "local_id": 25,
+          "entity_id": 117440537
+        },
+        {
+          "key": "DampCultist",
+          "local_id": 26,
+          "entity_id": 117440538
+        },
+        {
+          "key": "FossilStalker",
+          "local_id": 27,
+          "entity_id": 117440539
+        },
+        {
+          "key": "GremlinMerc",
+          "local_id": 28,
+          "entity_id": 117440540
+        },
+        {
+          "key": "HauntedShip",
+          "local_id": 29,
+          "entity_id": 117440541
+        },
+        {
+          "key": "KinFollower",
+          "local_id": 30,
+          "entity_id": 117440542
+        },
+        {
+          "key": "KinPriest",
+          "local_id": 31,
+          "entity_id": 117440543
+        },
+        {
+          "key": "LagavulinMatriarch",
+          "local_id": 32,
+          "entity_id": 117440544
+        },
+        {
+          "key": "LivingFog",
+          "local_id": 33,
+          "entity_id": 117440545
+        },
+        {
+          "key": "PhantasmalGardener",
+          "local_id": 34,
+          "entity_id": 117440546
+        },
+        {
+          "key": "PhrogParasite",
+          "local_id": 35,
+          "entity_id": 117440547
+        },
+        {
+          "key": "PunchConstruct",
+          "local_id": 36,
+          "entity_id": 117440548
+        },
+        {
+          "key": "Seapunk",
+          "local_id": 37,
+          "entity_id": 117440549
+        },
+        {
+          "key": "SewerClam",
+          "local_id": 38,
+          "entity_id": 117440550
+        },
+        {
+          "key": "SkulkingColony",
+          "local_id": 39,
+          "entity_id": 117440551
+        },
+        {
+          "key": "SludgeSpinner",
+          "local_id": 40,
+          "entity_id": 117440552
+        },
+        {
+          "key": "SoulFysh",
+          "local_id": 41,
+          "entity_id": 117440553
+        },
+        {
+          "key": "TerrorEel",
+          "local_id": 42,
+          "entity_id": 117440554
+        },
+        {
+          "key": "Toadpole",
+          "local_id": 43,
+          "entity_id": 117440555
+        },
+        {
+          "key": "TrackerRaider",
+          "local_id": 44,
+          "entity_id": 117440556
+        },
+        {
+          "key": "Vantom",
+          "local_id": 45,
+          "entity_id": 117440557
+        },
+        {
+          "key": "WaterfallGiant",
+          "local_id": 46,
+          "entity_id": 117440558
         }
       ]
     },
@@ -730,6 +983,136 @@
           "summary": {
             "name": "Vine Shambler"
           }
+        },
+        {
+          "key": "OvB_Ceremonial_Beast",
+          "local_id": 17,
+          "entity_id": 285212689
+        },
+        {
+          "key": "OvB_The_Kin",
+          "local_id": 18,
+          "entity_id": 285212690
+        },
+        {
+          "key": "OvB_Vantom",
+          "local_id": 19,
+          "entity_id": 285212691
+        },
+        {
+          "key": "OvE_Bygone_Effigy",
+          "local_id": 20,
+          "entity_id": 285212692
+        },
+        {
+          "key": "OvE_Byrdonis",
+          "local_id": 21,
+          "entity_id": 285212693
+        },
+        {
+          "key": "OvE_Phrog_Parasite",
+          "local_id": 22,
+          "entity_id": 285212694
+        },
+        {
+          "key": "UdB_Lagavulin_Matriarch",
+          "local_id": 23,
+          "entity_id": 285212695
+        },
+        {
+          "key": "UdB_Soul_Fysh",
+          "local_id": 24,
+          "entity_id": 285212696
+        },
+        {
+          "key": "UdB_Waterfall_Giant",
+          "local_id": 25,
+          "entity_id": 285212697
+        },
+        {
+          "key": "UdE_Phantasmal_Gardener",
+          "local_id": 26,
+          "entity_id": 285212698
+        },
+        {
+          "key": "UdE_Skulking_Colony",
+          "local_id": 27,
+          "entity_id": 285212699
+        },
+        {
+          "key": "UdE_Terror_Eel",
+          "local_id": 28,
+          "entity_id": 285212700
+        },
+        {
+          "key": "Ud_Corpse_Slugs",
+          "local_id": 29,
+          "entity_id": 285212701
+        },
+        {
+          "key": "Ud_Cultists",
+          "local_id": 30,
+          "entity_id": 285212702
+        },
+        {
+          "key": "Ud_Fossil_Stalker",
+          "local_id": 31,
+          "entity_id": 285212703
+        },
+        {
+          "key": "Ud_Haunted_Ship",
+          "local_id": 32,
+          "entity_id": 285212704
+        },
+        {
+          "key": "Ud_Living_Fog",
+          "local_id": 33,
+          "entity_id": 285212705
+        },
+        {
+          "key": "Ud_Many_Corpse_Slugs",
+          "local_id": 34,
+          "entity_id": 285212706
+        },
+        {
+          "key": "Ud_Punch_Construct",
+          "local_id": 35,
+          "entity_id": 285212707
+        },
+        {
+          "key": "Ud_Seapunk",
+          "local_id": 36,
+          "entity_id": 285212708
+        },
+        {
+          "key": "Ud_Sewer_Clam",
+          "local_id": 37,
+          "entity_id": 285212709
+        },
+        {
+          "key": "Ud_Sludge_Spinner",
+          "local_id": 38,
+          "entity_id": 285212710
+        },
+        {
+          "key": "Ud_Toadpoles",
+          "local_id": 39,
+          "entity_id": 285212711
+        },
+        {
+          "key": "Ud_Two_Gremlins_in_a_Trenchcoat",
+          "local_id": 40,
+          "entity_id": 285212712
+        },
+        {
+          "key": "Ud_Two_Tailed_Rats",
+          "local_id": 41,
+          "entity_id": 285212713
+        },
+        {
+          "key": "Ud_Underdocks_Wildlife",
+          "local_id": 42,
+          "entity_id": 285212714
         }
       ]
     },
@@ -898,5 +1281,6 @@
   "schema_version": 1,
   "catalog_version": "synthetic-v0",
   "game_version_string": "synthetic",
-  "source": "synthetic"
+  "source": "synthetic",
+  "target_game_version": "0.111"
 }

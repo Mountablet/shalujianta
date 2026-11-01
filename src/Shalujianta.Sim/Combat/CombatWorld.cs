@@ -1,3 +1,4 @@
+using Shalujianta.Sim.Catalog;
 using Shalujianta.Sim.Codec;
 using Shalujianta.Sim.Core;
 using Shalujianta.Sim.Potions;
@@ -33,12 +34,20 @@ public sealed class CombatWorld : ISimWorld
     private readonly List<int> _potionSlots = []; // catalog id per slot, 0 = empty
     private int _generatedUuidCursor = 1_000_000; // runtime-added cards (Slimed etc.)
 
+    /// <summary>End-of-turn-in-hand HP loss per status card (Infection 3, Beckon 6).</summary>
+    private static readonly Dictionary<int, int> StatusEndOfTurnDamage = new()
+    {
+        [CardIds.Infection] = 3,
+        [CardIds.Beckon] = 6,
+    };
+
     // RewardSpec combat_v0.1 accounting (design 5.3); bridge passes it to Python.
     private float _pendingReward;
     private int _hpAtStepStart;
     private int _hpAtTurnStart;
     private int _potionsDiscardedThisTurn;
     private bool _killedThisTurn;
+    private int _skillsPlayedThisTurn;
 
     // Zones are public for test/golden-fixture wiring; the kernel mutates them
     // through its own paths. Struct instances: no per-card heap allocation.
@@ -120,6 +129,9 @@ public sealed class CombatWorld : ISimWorld
             {
                 PowerOps.Apply(monster.Powers, p.CatalogId, p.Amount, p.JustApplied);
             }
+
+            monster.HpLostThisTurn = 0;
+            monster.HitThisTurn = false;
 
             Monsters.Add(monster);
             _ais.Add(spawn.AiFactory());
@@ -209,7 +221,16 @@ public sealed class CombatWorld : ISimWorld
         _zeroCostPlaysThisTurn = 0;
         _potionsDiscardedThisTurn = 0;
         _killedThisTurn = false;
+        _skillsPlayedThisTurn = 0;
         _hpAtTurnStart = _playerHp;
+        for (int i = 0; i < Monsters.Count; i++)
+        {
+            var m = Monsters[i];
+            m.HitThisTurn = false;
+            m.HpLostThisTurn = 0;
+            Monsters[i] = m;
+        }
+
         DrawCards(CombatRules.DrawPerTurn);
 
         foreach (int relicId in _start.RelicIds)
@@ -299,6 +320,18 @@ public sealed class CombatWorld : ISimWorld
             return Illegal();
         }
 
+        // Ringing: at most 1 card per turn. Smoggy: at most 1 Skill per turn.
+        if (PowerOps.GetAmount(PlayerPowers, PowerIds.Ringing) > 0 && _cardsPlayedThisTurn >= 1)
+        {
+            return Illegal();
+        }
+
+        if (PowerOps.GetAmount(PlayerPowers, PowerIds.Smoggy) > 0
+            && def.Type == CardType.Skill && _skillsPlayedThisTurn >= 1)
+        {
+            return Illegal();
+        }
+
         int cost = EffectiveCost(card); // Tangled surcharge included
         if (cost > _energy)
         {
@@ -315,6 +348,13 @@ public sealed class CombatWorld : ISimWorld
         Hand.RemoveAt(idx);
         Limbo.Add(card);
         _cardsPlayedThisTurn++;
+        if (def.Type == CardType.Skill)
+        {
+            _skillsPlayedThisTurn++;
+        }
+
+        // Bygone Effigy's Slow grows per card the player plays; growth resolves after
+        // the card so the first card of the turn rounds to base damage.
 
         if (cost == 0)
         {
@@ -335,6 +375,17 @@ public sealed class CombatWorld : ISimWorld
 
         def.Apply(this, card, action.Target);
         FinishCard(card);
+
+        // Bygone Effigy's Slow grows per card the player plays, after resolution.
+        for (int i = 0; i < Monsters.Count; i++)
+        {
+            var m = Monsters[i];
+            if (m.Alive && PowerOps.HasPower(m.Powers, PowerIds.Slow))
+            {
+                PowerOps.Apply(m.Powers, PowerIds.Slow, 1, justApplied: false);
+                Monsters[i] = m;
+            }
+        }
 
         if (_terminal)
         {
@@ -479,6 +530,20 @@ public sealed class CombatWorld : ISimWorld
         _phase = CombatPhase.Exec;
         _pendingReward += RewardV0.Turn;
 
+        // PlayerTurnEnd: status cards held in hand bite first (Infection, Beckon).
+        foreach (var c in Hand)
+        {
+            if (StatusEndOfTurnDamage.TryGetValue(c.CatalogId, out int bite))
+            {
+                LosePlayerHp(bite);
+            }
+        }
+
+        if (_terminal)
+        {
+            return Complete(_terminalStatus, done: true);
+        }
+
         // PlayerTurnEnd: ethereal exhausts, retain stays, everything else discards.
         for (int i = Hand.Count - 1; i >= 0; i--)
         {
@@ -573,14 +638,20 @@ public sealed class CombatWorld : ISimWorld
             }
 
             m.Block = 0; // monster block clears when its own turn begins
+            if (PowerOps.GetAmount(m.Powers, PowerIds.Plating) > 0)
+            {
+                PowerOps.Decrement(m.Powers, PowerIds.Plating); // loses 1 Plating at turn start
+            }
+
             var move = _ais[slot].MoveFor(this, slot, m.MoveId);
+            int vigor = PowerOps.GetAmount(m.Powers, PowerIds.Vigor);
             switch (m.Intent)
             {
                 case IntentId.Attack:
                     int hits = Math.Max(1, m.MoveHits);
                     for (int h = 0; h < hits; h++)
                     {
-                        DamagePlayer(m.MoveBaseDamage, m.Powers);
+                        DamagePlayer(h == 0 ? m.MoveBaseDamage + vigor : m.MoveBaseDamage, m.Powers, slot);
                         if (_terminal)
                         {
                             break;
@@ -614,6 +685,31 @@ public sealed class CombatWorld : ISimWorld
                 move.Effect(this, slot);
             }
 
+            // Ritual / Territorial: end of its own turn, gain Strength.
+            int ritual = PowerOps.GetAmount(m.Powers, PowerIds.Ritual)
+                         + PowerOps.GetAmount(m.Powers, PowerIds.Territorial);
+            if (ritual > 0)
+            {
+                PowerOps.Apply(m.Powers, PowerIds.Strength, ritual);
+            }
+
+            // End-of-own-turn plating block, after the strength bookkeeping above.
+            int plating = PowerOps.GetAmount(m.Powers, PowerIds.Plating);
+            if (plating > 0)
+            {
+                m.Block += DamageMath.BlockGain(plating, m.Powers);
+            }
+
+            if (PowerOps.GetAmount(m.Powers, PowerIds.Vigor) > 0)
+            {
+                PowerOps.Remove(m.Powers, PowerIds.Vigor); // consumed by this turn's attack
+            }
+
+            if (PowerOps.GetAmount(m.Powers, PowerIds.Asleep) > 0)
+            {
+                PowerOps.Decrement(m.Powers, PowerIds.Asleep); // sleeps X turns
+            }
+
             PowerOps.TickDecay(m.Powers);
             Monsters[slot] = m;
             if (_terminal)
@@ -640,7 +736,7 @@ public sealed class CombatWorld : ISimWorld
 
     // ---- damage / block entry points (used by card Apply and monster moves) ----
 
-    public void DamageMonster(int slot, int baseDamage, List<PowerStack>? attackerPowers = null)
+    public void DamageMonster(int slot, int baseDamage, List<PowerStack>? attackerPowers = null, bool fromAttackCard = true)
     {
         if (slot < 0 || slot >= Monsters.Count)
         {
@@ -653,22 +749,60 @@ public sealed class CombatWorld : ISimWorld
             return;
         }
 
-        int dmg = DamageMath.Outgoing(baseDamage, attackerPowers ?? PlayerPowers, m.Powers);
+        int slowStacks = PowerOps.GetAmount(m.Powers, PowerIds.Slow);
+        int dmg = DamageMath.Outgoing(baseDamage, attackerPowers ?? PlayerPowers, m.Powers, fromAttackCard ? slowStacks : 0);
+        if (PowerOps.GetAmount(m.Powers, PowerIds.Intangible) > 0 && dmg > 1)
+        {
+            dmg = 1;
+        }
+
         int absorbed = Math.Min(m.Block, dmg);
         m.Block -= absorbed;
         dmg -= absorbed;
         if (dmg > 0)
         {
-            if (PowerOps.GetAmount(m.Powers, PowerIds.Slippery) > 0)
+            int shell = PowerOps.GetAmount(m.Powers, PowerIds.HardenedShell);
+            if (shell > 0)
             {
-                // Slippery: the next HP loss is only 1, then the stack is consumed.
-                m.Hp -= 1;
-                PowerOps.Decrement(m.Powers, PowerIds.Slippery);
+                dmg = Math.Min(dmg, Math.Max(0, shell - m.HpLostThisTurn));
             }
-            else
+
+            if (dmg > 0)
             {
-                m.Hp -= dmg;
+                if (PowerOps.GetAmount(m.Powers, PowerIds.Slippery) > 0)
+                {
+                    // Slippery: the next HP loss is only 1, then the stack is consumed.
+                    m.Hp -= 1;
+                    m.HpLostThisTurn += 1;
+                    PowerOps.Decrement(m.Powers, PowerIds.Slippery);
+                }
+                else
+                {
+                    m.Hp -= dmg;
+                    m.HpLostThisTurn += dmg;
+                }
+
+                if (PowerOps.GetAmount(m.Powers, PowerIds.Asleep) > 0)
+                {
+                    // Waking on damage: Lagavulin loses all Plating.
+                    PowerOps.Remove(m.Powers, PowerIds.Asleep);
+                    PowerOps.Remove(m.Powers, PowerIds.Plating);
+                    Log("asleep_wake");
+                }
             }
+        }
+
+        int skittish = PowerOps.GetAmount(m.Powers, PowerIds.Skittish);
+        if (skittish > 0 && !m.HitThisTurn)
+        {
+            m.Block += skittish; // first time hit this turn
+            m.HitThisTurn = true;
+        }
+
+        int thorns = PowerOps.GetAmount(m.Powers, PowerIds.Thorns);
+        if (thorns > 0 && fromAttackCard)
+        {
+            DamagePlayer(thorns, m.Powers);
         }
 
         if (m.Hp <= 0)
@@ -680,13 +814,20 @@ public sealed class CombatWorld : ISimWorld
             // applier's death removes the player's Shrink/Constrict stacks.
             PowerOps.Remove(PlayerPowers, PowerIds.Shrink);
             PowerOps.Remove(PlayerPowers, PowerIds.Constrict);
+            int eruption = PowerOps.GetAmount(m.Powers, PowerIds.SteamEruption);
+            if (eruption > 0)
+            {
+                Log($"steam_eruption_explode: {eruption}");
+                LosePlayerHp(eruption); // Waterfall Giant blows on death
+            }
+
             Log($"monster_death: slot={m.Slot} id={m.CatalogId}");
         }
 
         Monsters[slot] = m;
     }
 
-    public void DamagePlayer(int baseDamage, List<PowerStack>? attackerPowers = null)
+    public void DamagePlayer(int baseDamage, List<PowerStack>? attackerPowers = null, int attackerSlot = -1)
     {
         if (_terminal)
         {
@@ -694,6 +835,11 @@ public sealed class CombatWorld : ISimWorld
         }
 
         int dmg = DamageMath.Outgoing(baseDamage, attackerPowers ?? [], PlayerPowers);
+        if (PowerOps.GetAmount(PlayerPowers, PowerIds.Intangible) > 0 && dmg > 1)
+        {
+            dmg = 1; // Intangible: all damage reduced to 1
+        }
+
         int absorbed = Math.Min(_playerBlock, dmg);
         _playerBlock -= absorbed;
         dmg -= absorbed;
@@ -701,6 +847,11 @@ public sealed class CombatWorld : ISimWorld
         {
             _playerHp -= dmg;
             _timesDamagedThisCombat++;
+            if (attackerSlot >= 0 && PowerOps.HasPower(Monsters[attackerSlot].Powers, PowerIds.Suck))
+            {
+                // Fossil Stalker's Suck: unblocked attack damage becomes Strength.
+                ApplyMonsterPower(attackerSlot, PowerIds.Strength, dmg);
+            }
         }
 
         if (_playerHp <= 0)
@@ -728,7 +879,13 @@ public sealed class CombatWorld : ISimWorld
             return;
         }
 
-        _playerHp = Math.Max(0, _playerHp - amount);
+        int loss = amount;
+        if (PowerOps.GetAmount(PlayerPowers, PowerIds.Intangible) > 0 && loss > 1)
+        {
+            loss = 1;
+        }
+
+        _playerHp = Math.Max(0, _playerHp - loss);
         if (_playerHp == 0)
         {
             SetTerminal(StepStatus.TerminalLoss);
@@ -766,6 +923,27 @@ public sealed class CombatWorld : ISimWorld
         }
     }
 
+    /// <summary>Adds N instances of a registered card on top of the draw pile (Beckon).</summary>
+    public void AddCardsToDrawPile(int catalogId, int count, int upgrade = 0)
+    {
+        if (!CardRegistry.TryGet(catalogId, out var def))
+        {
+            throw new InvalidOperationException($"card {catalogId} is not registered");
+        }
+
+        for (int i = 0; i < count; i++)
+        {
+            DrawPile.Add(new CardInstance
+            {
+                CatalogId = catalogId,
+                Uuid = _generatedUuidCursor++,
+                Upgrade = upgrade,
+                Flags = def.Flags,
+                CurrentCost = def.BaseCost,
+            });
+        }
+    }
+
     public void GainMonsterBlock(int slot, int baseBlock)
     {
         if (slot < 0 || slot >= Monsters.Count)
@@ -777,6 +955,35 @@ public sealed class CombatWorld : ISimWorld
         if (m.Alive)
         {
             m.Block += DamageMath.BlockGain(baseBlock, m.Powers);
+            Monsters[slot] = m;
+        }
+    }
+
+    public void HealMonster(int slot, int amount)
+    {
+        if (slot < 0 || slot >= Monsters.Count)
+        {
+            return;
+        }
+
+        var m = Monsters[slot];
+        if (m.Alive && amount > 0)
+        {
+            m.Hp = Math.Min(m.MaxHp, m.Hp + amount);
+            Monsters[slot] = m;
+        }
+    }
+
+    public void RemoveMonsterPower(int slot, int catalogId)
+    {
+        if (slot < 0 || slot >= Monsters.Count)
+        {
+            return;
+        }
+
+        var m = Monsters[slot];
+        if (PowerOps.Remove(m.Powers, catalogId))
+        {
             Monsters[slot] = m;
         }
     }
@@ -910,6 +1117,17 @@ public sealed class CombatWorld : ISimWorld
             }
 
             if (EffectiveCost(card) > _energy)
+            {
+                continue;
+            }
+
+            if (PowerOps.GetAmount(PlayerPowers, PowerIds.Ringing) > 0 && _cardsPlayedThisTurn >= 1)
+            {
+                continue;
+            }
+
+            if (PowerOps.GetAmount(PlayerPowers, PowerIds.Smoggy) > 0
+                && def.Type == CardType.Skill && _skillsPlayedThisTurn >= 1)
             {
                 continue;
             }
@@ -1602,7 +1820,7 @@ public sealed class CombatWorld : ISimWorld
         return -1;
     }
 
-    private void Log(string message) => _config.HookLog?.Invoke(message);
+    public void Log(string message) => _config.HookLog?.Invoke(message);
 
     private StepResult Illegal() => Complete(StepStatus.Illegal, done: false);
 }

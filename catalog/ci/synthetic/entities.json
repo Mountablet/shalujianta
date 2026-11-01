@@ -1,86 +1,522 @@
 {
   "catalog_version": "synthetic-v0",
   "game_version_string": "synthetic",
-  "note": "CI-only fake catalog. Not live Codex. SliceV0 names plus Overgrowth (密林) hallway pool additions. Ids are append-only: existing keys never renumber.",
+  "note": "CI-only fake catalog. Not live Codex. SliceV0 names plus Overgrowth (密林) hallway pool additions. Ids are append-only: existing keys never renumber. Target game build: 0.111 (owner-declared 2026-11-01). Wiki-sourced values fetched 2026-10-31/11-01; per-value verification against the local 0.111 sts2.dll happens in PR-014 parity.",
   "namespaces": {
     "CARD": [
-      {"key": "Strike_R", "name": "Strike", "cost": 1, "rarity": "Basic", "type": "Attack"},
-      {"key": "Defend_R", "name": "Defend", "cost": 1, "rarity": "Basic", "type": "Skill"},
-      {"key": "Bash", "name": "Bash", "cost": 2, "rarity": "Basic", "type": "Attack"},
-      {"key": "Wound", "name": "Wound", "cost": -1, "rarity": "Status", "type": "Status"},
-      {"key": "AscendersBane", "name": "Ascender's Bane", "cost": -1, "rarity": "Curse", "type": "Curse"},
-      {"key": "Slimed", "name": "Slimed", "cost": 1, "rarity": "Status", "type": "Status"}
+      {
+        "key": "Strike_R",
+        "name": "Strike",
+        "cost": 1,
+        "rarity": "Basic",
+        "type": "Attack"
+      },
+      {
+        "key": "Defend_R",
+        "name": "Defend",
+        "cost": 1,
+        "rarity": "Basic",
+        "type": "Skill"
+      },
+      {
+        "key": "Bash",
+        "name": "Bash",
+        "cost": 2,
+        "rarity": "Basic",
+        "type": "Attack"
+      },
+      {
+        "key": "Wound",
+        "name": "Wound",
+        "cost": -1,
+        "rarity": "Status",
+        "type": "Status"
+      },
+      {
+        "key": "AscendersBane",
+        "name": "Ascender's Bane",
+        "cost": -1,
+        "rarity": "Curse",
+        "type": "Curse"
+      },
+      {
+        "key": "Slimed",
+        "name": "Slimed",
+        "cost": 1,
+        "rarity": "Status",
+        "type": "Status"
+      },
+      {
+        "key": "Dazed",
+        "name": "Dazed",
+        "cost": -1,
+        "rarity": "Status",
+        "type": "Status"
+      },
+      {
+        "key": "Infection",
+        "name": "Infection",
+        "cost": -1,
+        "rarity": "Status",
+        "type": "Status"
+      },
+      {
+        "key": "Beckon",
+        "name": "Beckon",
+        "cost": -1,
+        "rarity": "Status",
+        "type": "Status"
+      }
     ],
     "RELIC": [
-      {"key": "BurningBlood", "name": "Burning Blood"}
+      {
+        "key": "BurningBlood",
+        "name": "Burning Blood"
+      }
     ],
     "POTION": [
-      {"key": "FirePotion", "name": "Fire Potion"},
-      {"key": "BlockPotion", "name": "Block Potion"}
+      {
+        "key": "FirePotion",
+        "name": "Fire Potion"
+      },
+      {
+        "key": "BlockPotion",
+        "name": "Block Potion"
+      }
     ],
     "POWER": [
-      {"key": "Vulnerable", "name": "Vulnerable"},
-      {"key": "Weak", "name": "Weak"},
-      {"key": "Strength", "name": "Strength"},
-      {"key": "Dexterity", "name": "Dexterity"},
-      {"key": "Frail", "name": "Frail"},
-      {"key": "Poison", "name": "Poison"},
-      {"key": "Artifact", "name": "Artifact"},
-      {"key": "Buffer", "name": "Buffer"},
-      {"key": "Constrict", "name": "Constrict"},
-      {"key": "Shrink", "name": "Shrink"},
-      {"key": "Slippery", "name": "Slippery"},
-      {"key": "Tangled", "name": "Tangled"}
+      {
+        "key": "Vulnerable",
+        "name": "Vulnerable"
+      },
+      {
+        "key": "Weak",
+        "name": "Weak"
+      },
+      {
+        "key": "Strength",
+        "name": "Strength"
+      },
+      {
+        "key": "Dexterity",
+        "name": "Dexterity"
+      },
+      {
+        "key": "Frail",
+        "name": "Frail"
+      },
+      {
+        "key": "Poison",
+        "name": "Poison"
+      },
+      {
+        "key": "Artifact",
+        "name": "Artifact"
+      },
+      {
+        "key": "Buffer",
+        "name": "Buffer"
+      },
+      {
+        "key": "Constrict",
+        "name": "Constrict"
+      },
+      {
+        "key": "Shrink",
+        "name": "Shrink"
+      },
+      {
+        "key": "Slippery",
+        "name": "Slippery"
+      },
+      {
+        "key": "Tangled",
+        "name": "Tangled"
+      },
+      {
+        "key": "Thorns"
+      },
+      {
+        "key": "Ritual"
+      },
+      {
+        "key": "Territorial"
+      },
+      {
+        "key": "Suck"
+      },
+      {
+        "key": "Plating"
+      },
+      {
+        "key": "Skittish"
+      },
+      {
+        "key": "HardenedShell"
+      },
+      {
+        "key": "Slow"
+      },
+      {
+        "key": "Vigor"
+      },
+      {
+        "key": "Intangible"
+      },
+      {
+        "key": "SteamEruption"
+      },
+      {
+        "key": "Asleep"
+      },
+      {
+        "key": "Smoggy"
+      },
+      {
+        "key": "Ringing"
+      }
     ],
     "MONSTER": [
-      {"key": "TwoTailedRat", "name": "Two-Tailed Rat", "hp": 12, "max_hp": 13},
-      {"key": "CubexConstruct", "name": "Cubex Construct"},
-      {"key": "Fogmog", "name": "Fogmog"},
-      {"key": "Flyconid", "name": "Flyconid"},
-      {"key": "FuzzyWurmCrawler", "name": "Fuzzy Wurm Crawler"},
-      {"key": "Inklet", "name": "Inklet"},
-      {"key": "LeafSlimeM", "name": "Leaf Slime (M)"},
-      {"key": "LeafSlimeS", "name": "Leaf Slime (S)"},
-      {"key": "Mawler", "name": "Mawler"},
-      {"key": "Nibbit", "name": "Nibbit"},
-      {"key": "ShrinkerBeetle", "name": "Shrinker Beetle"},
-      {"key": "SlitheringStrangler", "name": "Slithering Strangler"},
-      {"key": "SnappingJaxfruit", "name": "Snapping Jaxfruit"},
-      {"key": "TwigSlimeM", "name": "Twig Slime (M)"},
-      {"key": "TwigSlimeS", "name": "Twig Slime (S)"},
-      {"key": "VineShambler", "name": "Vine Shambler"}
+      {
+        "key": "TwoTailedRat",
+        "name": "Two-Tailed Rat",
+        "hp": 12,
+        "max_hp": 13
+      },
+      {
+        "key": "CubexConstruct",
+        "name": "Cubex Construct"
+      },
+      {
+        "key": "Fogmog",
+        "name": "Fogmog"
+      },
+      {
+        "key": "Flyconid",
+        "name": "Flyconid"
+      },
+      {
+        "key": "FuzzyWurmCrawler",
+        "name": "Fuzzy Wurm Crawler"
+      },
+      {
+        "key": "Inklet",
+        "name": "Inklet"
+      },
+      {
+        "key": "LeafSlimeM",
+        "name": "Leaf Slime (M)"
+      },
+      {
+        "key": "LeafSlimeS",
+        "name": "Leaf Slime (S)"
+      },
+      {
+        "key": "Mawler",
+        "name": "Mawler"
+      },
+      {
+        "key": "Nibbit",
+        "name": "Nibbit"
+      },
+      {
+        "key": "ShrinkerBeetle",
+        "name": "Shrinker Beetle"
+      },
+      {
+        "key": "SlitheringStrangler",
+        "name": "Slithering Strangler"
+      },
+      {
+        "key": "SnappingJaxfruit",
+        "name": "Snapping Jaxfruit"
+      },
+      {
+        "key": "TwigSlimeM",
+        "name": "Twig Slime (M)"
+      },
+      {
+        "key": "TwigSlimeS",
+        "name": "Twig Slime (S)"
+      },
+      {
+        "key": "VineShambler",
+        "name": "Vine Shambler"
+      },
+      {
+        "key": "CorpseSlug"
+      },
+      {
+        "key": "Seapunk"
+      },
+      {
+        "key": "SludgeSpinner"
+      },
+      {
+        "key": "Toadpole"
+      },
+      {
+        "key": "CalcifiedCultist"
+      },
+      {
+        "key": "DampCultist"
+      },
+      {
+        "key": "LivingFog"
+      },
+      {
+        "key": "FossilStalker"
+      },
+      {
+        "key": "GremlinMerc"
+      },
+      {
+        "key": "HauntedShip"
+      },
+      {
+        "key": "PunchConstruct"
+      },
+      {
+        "key": "SewerClam"
+      },
+      {
+        "key": "AxeRaider"
+      },
+      {
+        "key": "AssassinRaider"
+      },
+      {
+        "key": "BruteRaider"
+      },
+      {
+        "key": "CrossbowRaider"
+      },
+      {
+        "key": "TrackerRaider"
+      },
+      {
+        "key": "SkulkingColony"
+      },
+      {
+        "key": "PhantasmalGardener"
+      },
+      {
+        "key": "TerrorEel"
+      },
+      {
+        "key": "BygoneEffigy"
+      },
+      {
+        "key": "Byrdonis"
+      },
+      {
+        "key": "PhrogParasite"
+      },
+      {
+        "key": "WaterfallGiant"
+      },
+      {
+        "key": "SoulFysh"
+      },
+      {
+        "key": "LagavulinMatriarch"
+      },
+      {
+        "key": "CeremonialBeast"
+      },
+      {
+        "key": "KinPriest"
+      },
+      {
+        "key": "KinFollower"
+      },
+      {
+        "key": "Vantom"
+      }
     ],
     "INTENT": [
-      {"key": "Attack", "name": "Attack"},
-      {"key": "Defend", "name": "Defend"},
-      {"key": "Buff", "name": "Buff"},
-      {"key": "Debuff", "name": "Debuff"},
-      {"key": "Unknown", "name": "Unknown"}
+      {
+        "key": "Attack",
+        "name": "Attack"
+      },
+      {
+        "key": "Defend",
+        "name": "Defend"
+      },
+      {
+        "key": "Buff",
+        "name": "Buff"
+      },
+      {
+        "key": "Debuff",
+        "name": "Debuff"
+      },
+      {
+        "key": "Unknown",
+        "name": "Unknown"
+      }
     ],
     "ENCOUNTER": [
-      {"key": "Act1_TwoTailedRats", "name": "Two-Tailed Rats"},
-      {"key": "Ov_A_Lone_Nibbit", "name": "A Lone Nibbit"},
-      {"key": "Ov_A_Pair_of_Nibbits", "name": "A Pair of Nibbits"},
-      {"key": "Ov_Group_of_Slimes", "name": "Group of Slimes"},
-      {"key": "Ov_Swarm_of_Slimes", "name": "Swarm of Slimes"},
-      {"key": "Ov_Shrinker_Beetle", "name": "Shrinker Beetle"},
-      {"key": "Ov_Fuzzy_Wurm_Crawler", "name": "Fuzzy Wurm Crawler"},
-      {"key": "Ov_Overgrowth_Crawlers", "name": "Overgrowth Crawlers"},
-      {"key": "Ov_Inklets", "name": "Inklets"},
-      {"key": "Ov_Mawler", "name": "Mawler"},
-      {"key": "Ov_Shrink_Slime", "name": "Shroom and Slime"},
-      {"key": "Ov_Overgrowth_Flora", "name": "Overgrowth Flora"},
-      {"key": "Ov_Fogmog", "name": "Fogmog"},
-      {"key": "Ov_Cubex_Construct", "name": "Cubex Construct"},
-      {"key": "Ov_Vine_Shambler", "name": "Vine Shambler"},
-      {"key": "Ov_Strangler_and_Friend", "name": "Strangler and Friend"}
+      {
+        "key": "Act1_TwoTailedRats",
+        "name": "Two-Tailed Rats"
+      },
+      {
+        "key": "Ov_A_Lone_Nibbit",
+        "name": "A Lone Nibbit"
+      },
+      {
+        "key": "Ov_A_Pair_of_Nibbits",
+        "name": "A Pair of Nibbits"
+      },
+      {
+        "key": "Ov_Group_of_Slimes",
+        "name": "Group of Slimes"
+      },
+      {
+        "key": "Ov_Swarm_of_Slimes",
+        "name": "Swarm of Slimes"
+      },
+      {
+        "key": "Ov_Shrinker_Beetle",
+        "name": "Shrinker Beetle"
+      },
+      {
+        "key": "Ov_Fuzzy_Wurm_Crawler",
+        "name": "Fuzzy Wurm Crawler"
+      },
+      {
+        "key": "Ov_Overgrowth_Crawlers",
+        "name": "Overgrowth Crawlers"
+      },
+      {
+        "key": "Ov_Inklets",
+        "name": "Inklets"
+      },
+      {
+        "key": "Ov_Mawler",
+        "name": "Mawler"
+      },
+      {
+        "key": "Ov_Shrink_Slime",
+        "name": "Shroom and Slime"
+      },
+      {
+        "key": "Ov_Overgrowth_Flora",
+        "name": "Overgrowth Flora"
+      },
+      {
+        "key": "Ov_Fogmog",
+        "name": "Fogmog"
+      },
+      {
+        "key": "Ov_Cubex_Construct",
+        "name": "Cubex Construct"
+      },
+      {
+        "key": "Ov_Vine_Shambler",
+        "name": "Vine Shambler"
+      },
+      {
+        "key": "Ov_Strangler_and_Friend",
+        "name": "Strangler and Friend"
+      },
+      {
+        "key": "Ud_Corpse_Slugs"
+      },
+      {
+        "key": "Ud_Seapunk"
+      },
+      {
+        "key": "Ud_Sludge_Spinner"
+      },
+      {
+        "key": "Ud_Toadpoles"
+      },
+      {
+        "key": "Ud_Many_Corpse_Slugs"
+      },
+      {
+        "key": "Ud_Cultists"
+      },
+      {
+        "key": "Ud_Living_Fog"
+      },
+      {
+        "key": "Ud_Fossil_Stalker"
+      },
+      {
+        "key": "Ud_Two_Gremlins_in_a_Trenchcoat"
+      },
+      {
+        "key": "Ud_Haunted_Ship"
+      },
+      {
+        "key": "Ud_Punch_Construct"
+      },
+      {
+        "key": "Ud_Sewer_Clam"
+      },
+      {
+        "key": "Ud_Underdocks_Wildlife"
+      },
+      {
+        "key": "Ud_Two_Tailed_Rats"
+      },
+      {
+        "key": "UdE_Skulking_Colony"
+      },
+      {
+        "key": "UdE_Phantasmal_Gardener"
+      },
+      {
+        "key": "UdE_Terror_Eel"
+      },
+      {
+        "key": "UdB_Waterfall_Giant"
+      },
+      {
+        "key": "UdB_Soul_Fysh"
+      },
+      {
+        "key": "UdB_Lagavulin_Matriarch"
+      },
+      {
+        "key": "OvE_Bygone_Effigy"
+      },
+      {
+        "key": "OvE_Byrdonis"
+      },
+      {
+        "key": "OvE_Phrog_Parasite"
+      },
+      {
+        "key": "OvB_Ceremonial_Beast"
+      },
+      {
+        "key": "OvB_The_Kin"
+      },
+      {
+        "key": "OvB_Vantom"
+      }
     ],
     "KEYWORD": [
-      {"key": "Exhaust"},
-      {"key": "Ethereal"},
-      {"key": "Retain"},
-      {"key": "Innate"},
-      {"key": "Unplayable"}
+      {
+        "key": "Exhaust"
+      },
+      {
+        "key": "Ethereal"
+      },
+      {
+        "key": "Retain"
+      },
+      {
+        "key": "Innate"
+      },
+      {
+        "key": "Unplayable"
+      }
     ]
-  }
+  },
+  "target_game_version": "0.111"
 }

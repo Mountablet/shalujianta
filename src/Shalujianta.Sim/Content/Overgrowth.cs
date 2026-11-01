@@ -23,6 +23,10 @@ public static class Overgrowth
 
         _registered = true;
         Slimed.Register();
+        Wound.Register();
+        Dazed.Register();
+        Infection.Register();
+        Beckon.Register();
     }
 
     public static MonsterSpawn Nibbit() => new()
@@ -131,6 +135,65 @@ public static class Overgrowth
         AiFactory = () => new SlitheringStranglerAi(),
     };
 
+    public static MonsterSpawn BygoneEffigy() => new()
+    {
+        CatalogId = MonsterIds.BygoneEffigy,
+        HpMin = BygoneEffigyAi.HpMin,
+        HpMax = BygoneEffigyAi.HpMax,
+        AiFactory = () => new BygoneEffigyAi(),
+        StartingPowers = [new PowerStack(PowerIds.Slow, 1, JustApplied: false)],
+    };
+
+    public static MonsterSpawn Byrdonis() => new()
+    {
+        CatalogId = MonsterIds.Byrdonis,
+        HpMin = ByrdonisAi.HpMin,
+        HpMax = ByrdonisAi.HpMax,
+        AiFactory = () => new ByrdonisAi(),
+        StartingPowers = [new PowerStack(PowerIds.Territorial, 1, JustApplied: false)],
+    };
+
+    public static MonsterSpawn PhrogParasite() => new()
+    {
+        CatalogId = MonsterIds.PhrogParasite,
+        HpMin = PhrogParasiteAi.HpMin,
+        HpMax = PhrogParasiteAi.HpMax,
+        AiFactory = () => new PhrogParasiteAi(),
+    };
+
+    public static MonsterSpawn CeremonialBeast() => new()
+    {
+        CatalogId = MonsterIds.CeremonialBeast,
+        HpMin = CeremonialBeastAi.HpMin,
+        HpMax = CeremonialBeastAi.HpMax,
+        AiFactory = () => new CeremonialBeastAi(),
+    };
+
+    public static MonsterSpawn KinPriest() => new()
+    {
+        CatalogId = MonsterIds.KinPriest,
+        HpMin = KinPriestAi.HpMin,
+        HpMax = KinPriestAi.HpMax,
+        AiFactory = () => new KinPriestAi(),
+    };
+
+    public static MonsterSpawn KinFollower() => new()
+    {
+        CatalogId = MonsterIds.KinFollower,
+        HpMin = KinFollowerAi.HpMin,
+        HpMax = KinFollowerAi.HpMax,
+        AiFactory = () => new KinFollowerAi(),
+    };
+
+    public static MonsterSpawn Vantom() => new()
+    {
+        CatalogId = MonsterIds.Vantom,
+        HpMin = VantomAi.HpMin,
+        HpMax = VantomAi.HpMax,
+        AiFactory = () => new VantomAi(),
+        StartingPowers = [new PowerStack(PowerIds.Slippery, 9, JustApplied: false)],
+    };
+
     /// <summary>All implemented Overgrowth hallway encounters by bridge key.</summary>
     public static readonly IReadOnlyDictionary<string, (int EncounterId, Func<List<MonsterSpawn>> Build)> Hallway
         = new Dictionary<string, (int, Func<List<MonsterSpawn>>)>
@@ -181,6 +244,37 @@ public static class Overgrowth
                 SlitheringStrangler(),
                 SnappingJaxfruit(),
             ]),
+            // ---- Underdocks hallway pool (Act 1b) ----
+            ["Ud_Corpse_Slugs"] = (UnderdocksEncounterIds.CorpseSlugs, () => [Underdocks.CorpseSlug(), Underdocks.CorpseSlug()]),
+            ["Ud_Seapunk"] = (UnderdocksEncounterIds.Seapunk, () => [Underdocks.Seapunk()]),
+            ["Ud_Sludge_Spinner"] = (UnderdocksEncounterIds.SludgeSpinner, () => [Underdocks.SludgeSpinner()]),
+            ["Ud_Toadpoles"] = (UnderdocksEncounterIds.Toadpoles, () => [Underdocks.Toadpole(), Underdocks.Toadpole()]),
+            ["Ud_Many_Corpse_Slugs"] = (UnderdocksEncounterIds.ManyCorpseSlugs, () =>
+                [Underdocks.CorpseSlug(), Underdocks.CorpseSlug(), Underdocks.CorpseSlug()]),
+            ["Ud_Cultists"] = (UnderdocksEncounterIds.Cultists, () => [Underdocks.CalcifiedCultist(), Underdocks.DampCultist()]),
+            ["Ud_Living_Fog"] = (UnderdocksEncounterIds.LivingFog, () => [Underdocks.LivingFog()]),
+            ["Ud_Fossil_Stalker"] = (UnderdocksEncounterIds.FossilStalker, () => [Underdocks.FossilStalker()]),
+            ["Ud_Two_Gremlins_in_a_Trenchcoat"] = (UnderdocksEncounterIds.TwoGremlins, () => [Underdocks.GremlinMerc()]),
+            ["Ud_Haunted_Ship"] = (UnderdocksEncounterIds.HauntedShip, () => [Underdocks.HauntedShip()]),
+            ["Ud_Punch_Construct"] = (UnderdocksEncounterIds.PunchConstruct, () => [Underdocks.PunchConstruct()]),
+            ["Ud_Sewer_Clam"] = (UnderdocksEncounterIds.SewerClam, () => [Underdocks.SewerClam()]),
+            ["Ud_Underdocks_Wildlife"] = (UnderdocksEncounterIds.Wildlife, () => [Underdocks.CalcifiedCultist(), Underdocks.Seapunk()]),
+            ["Ud_Two_Tailed_Rats"] = (UnderdocksEncounterIds.TwoTailedRats, () => UnderdocksAct1.TwoTailedRatTrio()),
+            // ---- Underdocks elites + bosses ----
+            ["UdE_Skulking_Colony"] = (UnderdocksEncounterIds.ESkulkingColony, () => [Underdocks.SkulkingColony()]),
+            ["UdE_Phantasmal_Gardener"] = (UnderdocksEncounterIds.EPhantasmalGardener, () =>
+                [Underdocks.PhantasmalGardener(), Underdocks.PhantasmalGardener(), Underdocks.PhantasmalGardener(), Underdocks.PhantasmalGardener()]),
+            ["UdE_Terror_Eel"] = (UnderdocksEncounterIds.ETerrorEel, () => [Underdocks.TerrorEel()]),
+            ["UdB_Waterfall_Giant"] = (UnderdocksEncounterIds.BWaterfallGiant, () => [Underdocks.WaterfallGiant()]),
+            ["UdB_Soul_Fysh"] = (UnderdocksEncounterIds.BSoulFysh, () => [Underdocks.SoulFysh()]),
+            ["UdB_Lagavulin_Matriarch"] = (UnderdocksEncounterIds.BLagavulinMatriarch, () => [Underdocks.LagavulinMatriarch()]),
+            // ---- Overgrowth elites + bosses ----
+            ["OvE_Bygone_Effigy"] = (OvergrowthEncounterIds.EBygoneEffigy, () => [BygoneEffigy()]),
+            ["OvE_Byrdonis"] = (OvergrowthEncounterIds.EByrdonis, () => [Byrdonis()]),
+            ["OvE_Phrog_Parasite"] = (OvergrowthEncounterIds.EPhrogParasite, () => [PhrogParasite()]),
+            ["OvB_Ceremonial_Beast"] = (OvergrowthEncounterIds.BCeremonialBeast, () => [CeremonialBeast()]),
+            ["OvB_The_Kin"] = (OvergrowthEncounterIds.BTheKin, () => [KinPriest(), KinFollower(), KinFollower()]),
+            ["OvB_Vantom"] = (OvergrowthEncounterIds.BVantom, () => [Vantom()]),
         };
 
     /// <summary>Every implemented hallway encounter key (Underdocks + Overgrowth), sorted.</summary>

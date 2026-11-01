@@ -81,4 +81,8 @@ public struct MonsterInstance
 
     /// <summary>AI-private scratch that survives checkpoints (used-Roar flag, phase counters).</summary>
     public int AiState;
+
+    /// <summary>Per-player-turn scratch: Skittish trigger and Hardened Shell budget.</summary>
+    public bool HitThisTurn;
+    public int HpLostThisTurn;
 }

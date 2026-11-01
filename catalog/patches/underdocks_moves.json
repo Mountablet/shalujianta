@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "name": "underdocks_moves",
+  "source": "slaythespire.wiki.gg Slay_the_Spire_2 pages, checked 2026-11-01. Wiki numbers, NOT decompiled values; PR-014 parity must re-verify every entry against the local 0.111 sts2.dll.",
+  "catalog_version": "synthetic-v0",
+  "target_game_version": "0.111",
+  "mechanics": {
+    "Ravenous": "Corpse Slug eats dead allies -> Stunned + Strength (v0: not implemented, documented)",
+    "Thorns": "reflects attack damage back at the attacker (Toadpole Spiken)",
+    "Ritual": "gains its stacks as Strength at the end of each of its turns (Cultists)",
+    "Smoggy": "the player may play at most 1 Skill per turn (Living Fog)",
+    "Suck": "unblocked attack damage it deals becomes Strength (Fossil Stalker)",
+    "Plating": "gains X Block at end of its turn, loses 1 at start of its turn (Sewer Clam, Lagavulin)",
+    "Thievery": "steals gold on attack (Gremlin Merc; v0 logs only, no gold economy)",
+    "HardenedShell": "cannot lose more than X HP per turn (Skulking Colony)",
+    "Skittish": "the first time it is hit each turn, gains X Block (Phantasmal Gardener)",
+    "Slow": "receives 10% more damage from Attacks per card played this turn (Bygone Effigy)",
+    "SteamEruption": "stored damage explodes on death (Waterfall Giant; invulnerable phase not modeled in v0)",
+    "Vigor": "next attack +X damage, consumed (Terror Eel Thrash)",
+    "Intangible": "all damage and HP loss reduced to 1 (Soul Fysh Fade)",
+    "Asleep": "sleeps X turns or until damaged; loses all Plating on wake (Lagavulin Matriarch)",
+    "Territorial": "gains its stacks as Strength at end of its turns (Byrdonis)",
+    "Plow": "HP threshold stun (Ceremonial Beast; edge case simplified when already below threshold)"
+  },
+  "status_cards": {
+    "Slimed": "1-cost, 'Draw 1 card. Exhaust.' - playable",
+    "Dazed": "unplayable, Ethereal (exhausts from hand at end of turn)",
+    "Infection": "unplayable, 'At end of your turn in hand: take 3 damage'",
+    "Beckon": "unplayable, 'At end of your turn in hand: lose 6 HP'",
+    "Wound": "unplayable (STS2 rule not verified)"
+  },
+  "encounters": {
+    "not_implemented": [
+      "Ruby Raiders random composition (v0 fixes 3 of 5, but the 5 raiders are implemented)",
+      "Phrog Parasite's Infested death-summon (4 Wrigglers)",
+      "Fogmog's Gas Bomb summon",
+      "Gremlin Merc's death summon (Fat + Sneaky Gremlin)",
+      "Waterfall Giant's About-To-Blow invulnerable phase"
+    ]
+  }
+}

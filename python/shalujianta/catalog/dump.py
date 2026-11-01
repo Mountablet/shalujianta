@@ -195,6 +195,10 @@ def build_catalog(
     assigned["catalog_version"] = catalog_version
     assigned["game_version_string"] = game_version
     assigned["source"] = source
+    # Owner-declared target build the values aim at (e.g. "0.111"); the real
+    # guarantee is PR-014 parity against the installed dll.
+    if entities and entities.get("target_game_version"):
+        assigned["target_game_version"] = str(entities["target_game_version"])
     return assigned
 
 
@@ -208,6 +212,8 @@ def write_outputs(catalog: dict[str, Any], out_dir: Path) -> None:
         "game_version_string": catalog["game_version_string"],
         "source": catalog["source"],
     }
+    if catalog.get("target_game_version"):
+        meta["target_game_version"] = catalog["target_game_version"]
     (out_dir / "schema_version.json").write_text(
         json.dumps(meta, indent=2) + "\n", encoding="utf-8"
     )

@@ -2,5 +2,6 @@
   "schema_version": 1,
   "catalog_version": "synthetic-v0",
   "game_version_string": "synthetic",
-  "source": "synthetic"
+  "source": "synthetic",
+  "target_game_version": "0.111"
 }
