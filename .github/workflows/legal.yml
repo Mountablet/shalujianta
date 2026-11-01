@@ -1,0 +1,70 @@
+# Source of truth for the legal + catalog CI.
+# Copy to .github/workflows/legal.yml after `gh auth refresh -s workflow`.
+name: legal
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  legal-scan:
+    name: scan repo and prove fixtures fail
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Scan repository (must be clean)
+        run: python tools/legal_scan.py --root .
+
+      - name: Prove scanner detects planted violations
+        run: python tools/legal_scan.py --self-test
+
+  catalog:
+    name: synthetic catalog only
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install test deps
+        run: python -m pip install -r requirements-dev.txt
+
+      - name: Setup .NET (bindings bridge tests)
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "9.0.x"
+
+      - name: Build bindings
+        run: dotnet build src/Shalujianta.Bindings --nologo
+
+      - name: Dump synthetic catalog
+        run: python tools/dump_catalog.py --source synthetic --out catalog/generated
+
+      - name: Pytest
+        run: python -m pytest
+        env:
+          SHALUJIANTA_ALLOW_LIVE_CODEX: ""
+
+  sim:
+    name: C# sim tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "9.0.x"
+      - name: Test
+        run: dotnet test src/Shalujianta.Sim.Tests/Shalujianta.Sim.Tests.csproj --nologo
