@@ -32,6 +32,13 @@ public sealed class CombatWorld : ISimWorld
     private int _zeroCostPlaysThisTurn;
     private readonly List<int> _potionSlots = []; // catalog id per slot, 0 = empty
 
+    // RewardSpec combat_v0.1 accounting (design 5.3); bridge passes it to Python.
+    private float _pendingReward;
+    private int _hpAtStepStart;
+    private int _hpAtTurnStart;
+    private int _potionsDiscardedThisTurn;
+    private bool _killedThisTurn;
+
     // Zones are public for test/golden-fixture wiring; the kernel mutates them
     // through its own paths. Struct instances: no per-card heap allocation.
     public List<CardInstance> Hand { get; } = [];
@@ -192,6 +199,9 @@ public sealed class CombatWorld : ISimWorld
         _playerBlock = 0; // v0 has no block-persist power; Barricade-like lands with its power
         _cardsPlayedThisTurn = 0;
         _zeroCostPlaysThisTurn = 0;
+        _potionsDiscardedThisTurn = 0;
+        _killedThisTurn = false;
+        _hpAtTurnStart = _playerHp;
         DrawCards(CombatRules.DrawPerTurn);
 
         foreach (int relicId in _start.RelicIds)
@@ -211,24 +221,33 @@ public sealed class CombatWorld : ISimWorld
     {
         if (_terminal)
         {
-            return new StepResult(StepStatus.Illegal, 0f, true);
+            return Complete(StepStatus.Illegal, done: true);
         }
 
+        _pendingReward = 0f;
+        _hpAtStepStart = _playerHp;
         return action.Verb switch
         {
             Verb.PlayCard => StepPlayCard(action),
             Verb.EndTurn => StepEndTurn(),
             Verb.UsePotion => StepUsePotion(action),
             Verb.DiscardPotion => StepDiscardPotion(action),
-            Verb.Noop or Verb.Wait or Verb.State => new StepResult(StepStatus.Ok, 0f, false),
+            Verb.Noop or Verb.Wait or Verb.State => Complete(StepStatus.Ok, done: false),
             _ => LogAndReject(action.Verb),
         };
+    }
+
+    /// <summary>Applies the per-step HP shaping and returns the accumulated step reward.</summary>
+    private StepResult Complete(StepStatus status, bool done)
+    {
+        _pendingReward += RewardV0.HpStep * (_playerHp - _hpAtStepStart) / _playerMaxHp;
+        return new StepResult(status, _pendingReward, done);
     }
 
     private StepResult LogAndReject(Verb verb)
     {
         Log($"verb_not_supported_v0: {verb}");
-        return new StepResult(StepStatus.Illegal, 0f, false);
+        return Complete(StepStatus.Illegal, done: false);
     }
 
     private StepResult StepPlayCard(in Action action)
@@ -295,13 +314,14 @@ public sealed class CombatWorld : ISimWorld
             if (_zeroCostPlaysThisTurn == CombatRules.ZeroCostWarn)
             {
                 Log($"zero_cost_warn: {_zeroCostPlaysThisTurn} zero-cost plays without END_TURN");
+                _pendingReward += RewardV0.ZeroLoop;
             }
 
             if (_zeroCostPlaysThisTurn >= CombatRules.MaxZeroCostHardCut)
             {
                 FinishCard(card);
                 SetTerminal(StepStatus.StallCut);
-                return new StepResult(StepStatus.StallCut, 0f, true);
+                return Complete(StepStatus.StallCut, done: true);
             }
         }
 
@@ -310,16 +330,16 @@ public sealed class CombatWorld : ISimWorld
 
         if (_terminal)
         {
-            return new StepResult(_terminalStatus, 0f, true);
+            return Complete(_terminalStatus, done: true);
         }
 
         if (AllMonstersDead())
         {
             SetTerminal(StepStatus.TerminalWin);
-            return new StepResult(StepStatus.TerminalWin, 0f, true);
+            return Complete(StepStatus.TerminalWin, done: true);
         }
 
-        return new StepResult(StepStatus.Ok, 0f, false);
+        return Complete(StepStatus.Ok, done: false);
     }
 
     private StepResult StepUsePotion(in Action action)
@@ -360,19 +380,20 @@ public sealed class CombatWorld : ISimWorld
         // Potions cost no energy and do not count as card plays.
         def.Apply(this, action.Target);
         _potionSlots[slot] = 0;
+        _pendingReward += RewardV0.PotionUse;
 
         if (_terminal)
         {
-            return new StepResult(_terminalStatus, 0f, true);
+            return Complete(_terminalStatus, done: true);
         }
 
         if (AllMonstersDead())
         {
             SetTerminal(StepStatus.TerminalWin);
-            return new StepResult(StepStatus.TerminalWin, 0f, true);
+            return Complete(StepStatus.TerminalWin, done: true);
         }
 
-        return new StepResult(StepStatus.Ok, 0f, false);
+        return Complete(StepStatus.Ok, done: false);
     }
 
     private StepResult StepDiscardPotion(in Action action)
@@ -389,7 +410,8 @@ public sealed class CombatWorld : ISimWorld
         }
 
         _potionSlots[slot] = 0;
-        return new StepResult(StepStatus.Ok, 0f, false);
+        _potionsDiscardedThisTurn++;
+        return Complete(StepStatus.Ok, done: false);
     }
 
     /// <summary>Fills the first empty potion slot (rewards use the implicit pickup path post-v0).</summary>
@@ -447,6 +469,7 @@ public sealed class CombatWorld : ISimWorld
         }
 
         _phase = CombatPhase.Exec;
+        _pendingReward += RewardV0.Turn;
 
         // PlayerTurnEnd: ethereal exhausts, retain stays, everything else discards.
         for (int i = Hand.Count - 1; i >= 0; i--)
@@ -464,28 +487,60 @@ public sealed class CombatWorld : ISimWorld
             }
         }
 
+        // Overblock: block held beyond incoming+6 with no persist power in v0.
+        int incoming = PendingAttackDamage();
+        if (_playerBlock > incoming + 6)
+        {
+            _pendingReward += RewardV0.Overblock * (_playerBlock - incoming - 6);
+        }
+
+        if (_turn >= 15 && _playerHp == _hpAtTurnStart && !_killedThisTurn)
+        {
+            _pendingReward += RewardV0.StallHard;
+        }
+
+        if (_potionsDiscardedThisTurn > 0 && !_killedThisTurn)
+        {
+            _pendingReward += RewardV0.PotionDump; // v0 simplification of "dump before the end"
+        }
+
         PowerOps.TickDecay(PlayerPowers);
         RunEnemyTurn();
         if (_terminal)
         {
-            return new StepResult(_terminalStatus, 0f, true);
+            return Complete(_terminalStatus, done: true);
         }
 
         _turn++;
         if (_turn > _config.StallTurnLimit)
         {
             SetTerminal(StepStatus.StallCut);
-            return new StepResult(StepStatus.StallCut, 0f, true);
+            return Complete(StepStatus.StallCut, done: true);
         }
 
         RunPlayerTurnStart();
         if (AllMonstersDead())
         {
             SetTerminal(StepStatus.TerminalWin);
-            return new StepResult(StepStatus.TerminalWin, 0f, true);
+            return Complete(StepStatus.TerminalWin, done: true);
         }
 
-        return new StepResult(StepStatus.Ok, 0f, false);
+        return Complete(StepStatus.Ok, done: false);
+    }
+
+    /// <summary>Raw pending attack damage the monsters currently show (pre-multiplier estimate).</summary>
+    private int PendingAttackDamage()
+    {
+        int sum = 0;
+        foreach (var m in Monsters)
+        {
+            if (m.Alive && m.Intent == IntentId.Attack)
+            {
+                sum += m.MoveBaseDamage * Math.Max(1, m.MoveHits);
+            }
+        }
+
+        return sum;
     }
 
     private void RunEnemyTurn()
@@ -585,6 +640,7 @@ public sealed class CombatWorld : ISimWorld
         {
             m.Hp = 0;
             m.Alive = false;
+            _killedThisTurn = true;
             Log($"monster_death: slot={m.Slot} id={m.CatalogId}");
         }
 
@@ -1364,6 +1420,30 @@ public sealed class CombatWorld : ISimWorld
         _terminal = true;
         _terminalStatus = status;
         _phase = CombatPhase.Exec;
+
+        int potionsLeft = 0;
+        foreach (int id in _potionSlots)
+        {
+            if (id != 0)
+            {
+                potionsLeft++;
+            }
+        }
+
+        switch (status)
+        {
+            case StepStatus.TerminalWin:
+                _pendingReward += RewardV0.CombatWin
+                                  + RewardV0.HpFrac * _playerHp / (float)_playerMaxHp
+                                  + RewardV0.PotionValueOutside * potionsLeft;
+                break;
+            case StepStatus.TerminalLoss:
+                _pendingReward += RewardV0.CombatLose - RewardV0.PotionValueOutside * potionsLeft;
+                break;
+            case StepStatus.StallCut:
+                _pendingReward += RewardV0.StallCut;
+                break;
+        }
         foreach (int relicId in _start.RelicIds)
         {
             if (RelicRegistry.TryGet(relicId, out var hooks))
@@ -1420,5 +1500,5 @@ public sealed class CombatWorld : ISimWorld
 
     private void Log(string message) => _config.HookLog?.Invoke(message);
 
-    private static StepResult Illegal() => new(StepStatus.Illegal, 0f, false);
+    private StepResult Illegal() => Complete(StepStatus.Illegal, done: false);
 }
