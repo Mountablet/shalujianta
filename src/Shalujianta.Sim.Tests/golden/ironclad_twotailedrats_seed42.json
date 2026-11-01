@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "name": "ironclad_twotailedrats_seed42",
+  "description": "SliceV0 golden replay: Ironclad starter deck + Burning Blood vs Act1_TwoTailedRats (owner-frozen x2), seed 42. First frame must be hand_count == 5 (design 4.12 double-draw guard). Values are sim-pinned determinism locks, NOT dll parity (PR-014 re-verifies).",
+  "seed": 42,
+  "encounter": "Act1_TwoTailedRats",
+  "initial_expect": {
+    "player_hp": 80,
+    "energy": 3,
+    "turn": 1,
+    "hand_count": 5,
+    "monster_count": 2,
+    "monster_hp": [
+      19,
+      20
+    ]
+  },
+  "steps": [
+    {
+      "action": {
+        "verb": "PLAY_ALL",
+        "cards": [
+          "Bash",
+          "Strike_R",
+          "Strike_R"
+        ],
+        "target": "first_alive",
+        "then_end_turn": true
+      },
+      "expect": {
+        "turn": 2,
+        "player_hp": 64,
+        "hand_count": 5,
+        "monster_hp": [
+          2,
+          20
+        ],
+        "monster_vulnerable": [
+          2,
+          null
+        ]
+      }
+    },
+    {
+      "action": {
+        "verb": "PLAY_ALL",
+        "cards": [
+          "Bash",
+          "Strike_R",
+          "Strike_R"
+        ],
+        "target": "first_alive",
+        "then_end_turn": true
+      },
+      "expect": {
+        "turn": 3,
+        "player_hp": 64,
+        "hand_count": 5,
+        "monster_alive": [
+          false,
+          true
+        ],
+        "monster_hp": [
+          null,
+          14
+        ]
+      }
+    },
+    {
+      "action": {
+        "verb": "PLAY_ALL",
+        "cards": [
+          "Bash",
+          "Strike_R",
+          "Strike_R"
+        ],
+        "target": "first_alive",
+        "then_end_turn": true
+      },
+      "expect": {
+        "turn": 4,
+        "player_hp": 58,
+        "hand_count": 5,
+        "monster_hp": [
+          null,
+          2
+        ]
+      }
+    },
+    {
+      "action": {
+        "verb": "PLAY_ALL",
+        "cards": [
+          "Bash",
+          "Strike_R",
+          "Strike_R"
+        ],
+        "target": "first_alive",
+        "then_end_turn": false
+      },
+      "expect": {
+        "status": "TerminalWin",
+        "player_hp": 64,
+        "hand_count": 4,
+        "monster_alive": [
+          false,
+          false
+        ]
+      }
+    }
+  ],
+  "final_expect": {
+    "status": "TerminalWin",
+    "player_hp": 64
+  }
+}

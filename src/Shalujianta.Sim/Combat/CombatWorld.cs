@@ -54,6 +54,15 @@ public sealed class CombatWorld : ISimWorld
     public bool ShufflePending => DrawPile.Count == 0 && DiscardPile.Count > 0;
     public bool IsTerminal => _terminal;
 
+    /// <summary>Terminal status once IsTerminal; StepStatus.Ok before that.</summary>
+    public StepStatus TerminalStatus => _terminal ? _terminalStatus : StepStatus.Ok;
+
+    /// <summary>
+    /// RNG handle for battle AI and relic hooks (streams: MonsterAi etc.). NoSL search
+    /// worlds (PR-008) must never hand out the real world's rng.
+    /// </summary>
+    public MultiRng Rng => _rng;
+
     public CombatWorld(SimConfig config, CombatStart start, int runSeedI32)
     {
         _config = config;
@@ -68,18 +77,34 @@ public sealed class CombatWorld : ISimWorld
 
         foreach (var spawn in start.Monsters)
         {
+            int hp = ResolveSpawnHp(spawn);
             Monsters.Add(new MonsterInstance
             {
                 Slot = Monsters.Count,
                 CatalogId = spawn.CatalogId,
-                Hp = spawn.Hp,
-                MaxHp = spawn.MaxHp < 0 ? spawn.Hp : spawn.MaxHp,
+                Hp = hp,
+                MaxHp = spawn.MaxHp < 0 ? hp : spawn.MaxHp,
                 Alive = true,
                 IntentKnown = true,
                 Powers = [],
             });
             _ais.Add(spawn.AiFactory());
         }
+    }
+
+    private int ResolveSpawnHp(MonsterSpawn spawn)
+    {
+        if (spawn.Hp > 0)
+        {
+            return spawn.Hp;
+        }
+
+        if (spawn.HpMin > 0 && spawn.HpMax >= spawn.HpMin)
+        {
+            return spawn.HpMin + _rng.NextInt(RngStream.MonsterAi, spawn.HpMax - spawn.HpMin + 1);
+        }
+
+        throw new InvalidOperationException($"monster spawn {spawn.CatalogId} needs Hp or a HpMin/HpMax range");
     }
 
     /// <summary>BattleStart + first PlayerTurnStart. Agents only ever see the post-turn-start state.</summary>
@@ -473,6 +498,14 @@ public sealed class CombatWorld : ISimWorld
     }
 
     public void GainPlayerBlock(int baseBlock) => _playerBlock += DamageMath.BlockGain(baseBlock, PlayerPowers);
+
+    public void HealPlayer(int amount)
+    {
+        if (amount > 0)
+        {
+            _playerHp = Math.Min(_playerMaxHp, _playerHp + amount);
+        }
+    }
 
     /// <summary>
     /// Returns the card currently being resolved from limbo back to the hand

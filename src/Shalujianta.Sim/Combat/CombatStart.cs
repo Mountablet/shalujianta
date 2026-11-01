@@ -1,10 +1,14 @@
 namespace Shalujianta.Sim.Combat;
 
-/// <summary>One enemy row at combat setup.</summary>
+/// <summary>One enemy row at combat setup. HP is either exact (Hp) or rolled on the MonsterAi stream (HpMin/HpMax).</summary>
 public sealed class MonsterSpawn
 {
     public required int CatalogId { get; init; }
-    public required int Hp { get; init; }
+    public int Hp { get; init; } = -1;
+
+    /// <summary>Inclusive roll range; ignored when Hp is set.</summary>
+    public int HpMin { get; init; } = -1;
+    public int HpMax { get; init; } = -1;
 
     /// <summary>-1 means same as Hp.</summary>
     public int MaxHp { get; init; } = -1;
