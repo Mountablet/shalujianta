@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<title>shalujianta replay viewer</title>
+<style>
+  body { font-family: "Segoe UI", "Microsoft YaHei", sans-serif; background: #14181f; color: #d7dde6; margin: 0; padding: 24px; }
+  h1 { font-size: 18px; margin: 0 0 12px; }
+  #file { margin-bottom: 16px; }
+  .panel { background: #1c2230; border: 1px solid #2a3245; border-radius: 8px; padding: 16px; margin-bottom: 12px; }
+  .row { display: flex; gap: 24px; flex-wrap: wrap; }
+  .player { min-width: 220px; }
+  .monster { min-width: 200px; border: 1px solid #2a3245; border-radius: 6px; padding: 8px 12px; }
+  .dead { opacity: 0.35; text-decoration: line-through; }
+  .hpbar { height: 8px; background: #2a3245; border-radius: 4px; overflow: hidden; margin-top: 4px; }
+  .hpfill { height: 100%; background: #d84a44; }
+  .block { color: #7fb3ff; }
+  .hand { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+  .card { background: #232b3d; border: 1px solid #39435c; border-radius: 6px; padding: 6px 10px; font-size: 13px; }
+  .card.played { outline: 2px solid #e8b84b; }
+  .nav { margin: 8px 0; }
+  button { background: #2a3245; color: #d7dde6; border: 0; border-radius: 6px; padding: 6px 14px; margin-right: 6px; cursor: pointer; }
+  button:disabled { opacity: 0.4; }
+  .meta { color: #8b96a8; font-size: 13px; }
+  .action { color: #e8b84b; font-family: Consolas, monospace; }
+  select { background: #1c2230; color: #d7dde6; border: 1px solid #2a3245; border-radius: 6px; padding: 4px; }
+</style>
+</head>
+<body>
+<h1>shalujianta replay viewer</h1>
+<div class="panel">
+  <input id="file" type="file" accept=".jsonl">
+  <span class="meta">加载 python/shalujianta/eval/results/trace_*.jsonl(单行 JSON 的录制)</span>
+  <div id="episodes" style="margin-top:8px"></div>
+</div>
+<div id="stage" style="display:none">
+  <div class="panel nav">
+    <button id="prev">← 上一步</button>
+    <button id="next">下一步 →</button>
+    <span id="pos" class="meta"></span>
+    <span id="action" class="action"></span>
+  </div>
+  <div class="panel row">
+    <div class="player" id="player"></div>
+    <div id="monsters" class="row"></div>
+  </div>
+  <div class="panel">
+    <div class="meta">手牌</div>
+    <div class="hand" id="hand"></div>
+  </div>
+</div>
+<script>
+const NAMES = {
+  16777217: "Ascender's Bane", 16777218: "Bash", 16777219: "Defend", 16777220: "Strike", 16777221: "Wound",
+};
+const FLAT_NAMES = slot => {
+  if (slot < 90) return `打牌 hand[${Math.floor(slot/9)}] 目标槽 ${slot%9}`;
+  if (slot < 135) return `用药水 slot[${Math.floor((slot-90)/9)}] 目标槽 ${(slot-90)%9}`;
+  if (slot < 140) return `丢药水 slot[${slot-135}]`;
+  if (slot === 140) return "结束回合";
+  return `slot ${slot}`;
+};
+let episodes = new Map(); // episode -> events[]
+let current = null, cursor = 0;
+
+document.getElementById("file").addEventListener("change", async e => {
+  const text = await e.target.files[0].text();
+  episodes = new Map();
+  for (const line of text.split("\n")) {
+    if (!line.trim()) continue;
+    const ev = JSON.parse(line);
+    if (!episodes.has(ev.episode)) episodes.set(ev.episode, []);
+    episodes.get(ev.episode).push(ev);
+  }
+  const sel = document.getElementById("episodes");
+  sel.innerHTML = "";
+  const pick = document.createElement("select");
+  for (const key of episodes.keys()) {
+    const opt = document.createElement("option");
+    opt.value = key; opt.textContent = `对局 ${key}(${episodes.get(key).length - 1} 步)`;
+    pick.appendChild(opt);
+  }
+  pick.addEventListener("change", () => load(+pick.value));
+  sel.appendChild(pick);
+  if (episodes.size) load(episodes.keys().next().value);
+});
+
+function load(ep) { current = episodes.get(ep); cursor = 0; render(); }
+
+function cardName(id) { return NAMES[id] || `卡 ${id}`; }
+
+function render() {
+  document.getElementById("stage").style.display = "";
+  const ev = current[cursor];
+  const p = ev.player;
+  document.getElementById("pos").textContent = `步 ${cursor}/${current.length - 1}`;
+  const act = ev.event === "step" ? FLAT_NAMES(ev.flat) : ev.event;
+  document.getElementById("action").textContent = ev.event === "step" ? `→ ${act}(奖励 ${ev.reward?.toFixed(4)})` : `→ ${act}`;
+  document.getElementById("player").innerHTML =
+    `<div class="meta">玩家(HP ${p.hp}/${p.max_hp} <span class="block">格挡 ${p.block}</span> 能量 ${p.energy}/${p.max_energy})</div>
+     <div class="hpbar"><div class="hpfill" style="width:${(100*p.hp/p.max_hp).toFixed(1)}%"></div></div>
+     <div class="meta">力量:${powers(p, 67108870)} 易伤:${powers(p, 67108871)} 虚弱:${powers(p, 67108872)}</div>
+     <div class="meta">药水槽:${ev.potion_slots.map(x => x === 0 ? "空" : "药").join(" | ")}</div>`;
+  document.getElementById("monsters").innerHTML = ev.monsters.map(m => `
+    <div class="monster ${m.is_gone ? "dead" : ""}">
+      <div>鼠 slot${m.slot}(id ${m.catalog_id})</div>
+      <div>HP ${m.hp}/${m.max_hp} <span class="block">格挡 ${m.block}</span></div>
+      <div class="hpbar"><div class="hpfill" style="width:${(100*m.hp/m.max_hp).toFixed(1)}%"></div></div>
+      <div class="meta">意图:${m.is_gone ? "-" : intent(m)}</div>
+      <div class="meta">易伤:${powers(m, 67108871)} 力量:${powers(m, 67108870)}</div>
+    </div>`).join("");
+  const played = ev.event === "step" ? handUuidOf(current, cursor) : -1;
+  document.getElementById("hand").innerHTML = (ev.hand || []).map(c =>
+    `<div class="card">${cardName(c.catalog_id)}(费 ${c.current_cost}${c.upgrade ? ` +${c.upgrade}` : ""})</div>`).join("")
+    || "<span class='meta'>(空)</span>";
+}
+
+function powers(u, id) { return (u.powers || []).filter(x => x.catalog_id === id).reduce((a, x) => a + x.amount, 0); }
+function intent(m) { return {0:"未知",1:"攻击",2:"防御",3:"强化",4:"弱化"}[m.intent_id] + ` ${m.move_base_damage}x${m.move_hits}`; }
+function handUuidOf(evs, i) { return -1; } // flat->card 对齐需要 uuid;v0 以槽位号展示动作即可
+
+document.getElementById("prev").addEventListener("click", () => { if (cursor > 0) { cursor--; render(); } });
+document.getElementById("next").addEventListener("click", () => { if (cursor < current.length - 1) { cursor++; render(); } });
+document.addEventListener("keydown", e => {
+  if (e.key === "ArrowRight") document.getElementById("next").click();
+  if (e.key === "ArrowLeft") document.getElementById("prev").click();
+});
+</script>
+</body>
+</html>

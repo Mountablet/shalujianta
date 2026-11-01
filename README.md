@@ -17,6 +17,12 @@ Slay the Spire 2 的打牌 AI：无头模拟器 + 局内策略 + 局外搜索。
 - **PR-006**：药水槽 + FirePotion / BlockPotion
 - **PR-007**：256 槽 ActionMask 收尾（X-cost / HAND_SELECT 恒 0、mask↔Step 全槽一致性）
 - **PR-008**：`Shalujianta.Bindings` JSONL 桥接 + Python `CombatEnv` / `NoSlSearchEnv` + `clone_for_search`（PIMC 确定化）+ 随机 rollout（[吞吐报告](docs/throughput-v0.md)）
+- **PR-009**：starter-only `CombatGenerator` + `v0_act1_hallway` HP 结转（procedural 关闭到 PR-005b）
+- **PR-010**：RewardSpec `combat_v0.1`（C#/Python 逐常数一致，反拖延/反倒药/反囤药/反过量格挡）
+- **PR-011**：Heuristic40 + 1-ply 浅搜索（只经 `clone_for_search`，KD-16 结构保证）
+- **PR-012**：固定种子评估套件 + replay viewer；`v0_act1_hallway`：启发 100% 胜/74.7% HP vs 随机 88%/35.7%（[结果](python/shalujianta/eval/results/)）
+
+**官方 v0（PR-000–PR-012）至此全部落地。** 学习策略（BC/PPO）、Adapter、第二角色均为 post-v0。
 
 已锁定：
 
@@ -46,6 +52,11 @@ python -m pytest
 dotnet test src/Shalujianta.Sim.Tests/Shalujianta.Sim.Tests.csproj
 # 随机 rollout(Phase-1 DoD 冒烟)
 $env:PYTHONPATH="python"; python -m shalujianta.tools.random_rollout --slice v0 --n 10000
+
+# 评估套件(数字入库到 python/shalujianta/eval/results/)
+$env:PYTHONPATH="python"; python -m shalujianta.eval.run_suite --suite v0_act1_hallway --policy heuristic --n 100 --out my_run.json
+
+# 回放查看器:浏览器打开 tools/replay_viewer/index.html,加载 results/trace_*.jsonl
 ```
 
 GitHub Actions 工作流源文件在 `tools/ci/legal.yml`。要启用线上 CI，需要给 `gh` 补 `workflow` 权限后再把该文件复制到 `.github/workflows/legal.yml`。

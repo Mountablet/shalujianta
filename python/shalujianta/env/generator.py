@@ -95,6 +95,7 @@ def play_fight(
     fight: FightSpec,
     policy: Callable[[CombatEnv, dict[str, Any]], int] | None = None,
     max_steps: int = 120,
+    on_step: Callable[[dict[str, Any]], None] | None = None,
 ) -> FightResult:
     """Runs one fight to terminal; policy defaults to uniform random legal."""
     rng = random.Random(fight.seed)
@@ -116,6 +117,19 @@ def play_fight(
         reward_total += reward
         turns = obs["combat"]["turn"]
         steps += 1
+        if on_step is not None:
+            on_step({
+                "event": "step",
+                "step": steps,
+                "flat": int(slot),
+                "reward": reward,
+                "status": info["status"],
+                "turn": turns,
+                "player": obs["combat"]["player"],
+                "monsters": obs["combat"]["monsters"],
+                "hand": obs["combat"]["hand"],
+                "potion_slots": obs["combat"]["potion_slots"],
+            })
         if terminated:
             win = info["status"] == "TerminalWin"
             player = obs["combat"]["player"]

@@ -1,0 +1,11 @@
+# Evaluation suites (design 5.9). Flat key: value, no yaml dep.
+# Every checkpoint reruns v0_first_fight; the full set runs daily (manual locally).
+v0_first_fight:
+  n: 100
+  encounter: Act1_TwoTailedRats
+  hp_full: 1
+v0_act1_hallway:
+  n: 200
+  length: 3
+v0_illegal_rate:
+  n: 50
