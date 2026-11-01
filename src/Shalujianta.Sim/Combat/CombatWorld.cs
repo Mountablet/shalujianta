@@ -971,6 +971,72 @@ public sealed class CombatWorld : ISimWorld
         return copy;
     }
 
+    /// <summary>
+    /// PIMC determinization (§4.10.1 / §5.7): public state is copied exactly; the true
+    /// draw order is destroyed and rebuilt as a uniform permutation of the bag multiset
+    /// using fresh randomness derived from resampleSeed (never the public seed, never
+    /// the run rng). Future hidden rolls (monster AI) belong to this determinization:
+    /// the search world's rng is freshly seeded from resampleSeed.
+    /// </summary>
+    public INoSlSearchWorld CloneForSearch(ulong resampleSeed)
+    {
+        var cfg = new SimConfig
+        {
+            CatalogVersion = _config.CatalogVersion,
+            SchemaVersion = _config.SchemaVersion,
+            Mode = InfoMode.NoSl,
+            CharacterId = _config.CharacterId,
+            Ascension = _config.Ascension,
+            StallTurnLimit = _config.StallTurnLimit,
+            RngBackend = _config.RngBackend,
+            GameVersionString = _config.GameVersionString,
+        };
+        var search = new CombatWorld(cfg, _start, 0);
+        var snap = SnapshotState();
+        snap.Draw = ResampleDrawPile(snap.Draw, resampleSeed);
+        search.ApplySnapshot(snap);
+        search._rng.Seed(unchecked((int)(resampleSeed ^ (resampleSeed >> 32))));
+        return new NoSlSearchWorld(search);
+    }
+
+    private List<CardSnapshot> ResampleDrawPile(List<CardSnapshot> realDraw, ulong resampleSeed)
+    {
+        // Multiset of catalog ids only; instance identities are reattached in bag order.
+        var byCatalog = new SortedDictionary<int, Queue<CardSnapshot>>();
+        foreach (var card in realDraw.OrderBy(c => c.Uuid))
+        {
+            if (!byCatalog.TryGetValue(card.CatalogId, out var q))
+            {
+                q = new Queue<CardSnapshot>();
+                byCatalog[card.CatalogId] = q;
+            }
+
+            q.Enqueue(card);
+        }
+
+        var ids = new List<int>(realDraw.Count);
+        foreach (var card in realDraw)
+        {
+            ids.Add(card.CatalogId);
+        }
+
+        ids.Sort();
+        var pcg = new Pcg32(resampleSeed);
+        for (int i = ids.Count - 1; i > 0; i--)
+        {
+            int j = pcg.Next(i + 1);
+            (ids[i], ids[j]) = (ids[j], ids[i]);
+        }
+
+        var resampled = new List<CardSnapshot>(realDraw.Count);
+        foreach (int id in ids)
+        {
+            resampled.Add(byCatalog[id].Dequeue());
+        }
+
+        return resampled;
+    }
+
     private CombatSnapshot SnapshotState()
     {
         var snap = new CombatSnapshot

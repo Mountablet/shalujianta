@@ -33,8 +33,8 @@ public sealed class SimConfig
 }
 
 /// <summary>
-/// Phase-1 world API (§4.10). CloneForSearch / INoSlSearchWorld land with PR-008;
-/// Observe() lives on CombatWorld until the full Observation codec lands.
+/// Phase-1 world API (§4.10). Observe() lives on CombatWorld until the full
+/// Observation codec lands (PR-008 ships the JSON bridge instead).
 /// </summary>
 public interface ISimWorld
 {
@@ -47,6 +47,26 @@ public interface ISimWorld
 
     /// <summary>Deep copy including draw order and all RNG internals. SL ONLY (KD-16).</summary>
     ISimWorld Clone();
+
+    /// <summary>
+    /// PIMC determinization (§4.10.1): copies only info-set-legal state, destroys the
+    /// true draw order and rng internals, resamples hidden variables from resampleSeed.
+    /// </summary>
+    INoSlSearchWorld CloneForSearch(ulong resampleSeed);
     ActionMask LegalActions();
     StepResult Step(in Action action);
+}
+
+/// <summary>
+/// The only handle a NoSL search may hold (KD-16). Implementations must not carry a
+/// reference back to the real world; deliberately absent: Clone, Checkpoint, Restore,
+/// Seed, ExportState, Hash64.
+/// </summary>
+public interface INoSlSearchWorld
+{
+    ulong InfoSetHash64();
+    ActionMask LegalActions();
+    StepResult Step(in Action action);
+    CombatObservation Observe();
+    INoSlSearchWorld ResampleHidden(ulong resampleSeed);
 }

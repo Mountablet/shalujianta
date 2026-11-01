@@ -13,6 +13,10 @@ Slay the Spire 2 的打牌 AI：无头模拟器 + 局内策略 + 局外搜索。
 - **PR-002**：`ObservationV1` / `ActionV1` + NoSL 投影 + 256 槽展开表
 - **PR-003**：钉死的 `System.Random` 兼容实现、RNG 流哈希表、`SimCheckpoint`
 - **PR-004**：战斗内核与回合机（`CombatWorld`：BattleStart 不抽牌、每回合 TurnStart 抽 5、END_TURN 内敌方、手牌上限 10、0 费硬切、SL Clone/Checkpoint/双哈希）
+- **PR-005**：SliceV0 内容（Ironclad 起始套、Burning Blood、Two-Tailed Rats、黄金测试 `ironclad_twotailedrats_seed42`；数值取自 wiki.gg，PR-014 parity 复核）
+- **PR-006**：药水槽 + FirePotion / BlockPotion
+- **PR-007**：256 槽 ActionMask 收尾（X-cost / HAND_SELECT 恒 0、mask↔Step 全槽一致性）
+- **PR-008**：`Shalujianta.Bindings` JSONL 桥接 + Python `CombatEnv` / `NoSlSearchEnv` + `clone_for_search`（PIMC 确定化）+ 随机 rollout（[吞吐报告](docs/throughput-v0.md)）
 
 已锁定：
 
@@ -37,8 +41,11 @@ python tools/legal_scan.py
 python tools/legal_scan.py --self-test
 python -m pip install -r requirements-dev.txt
 python tools/dump_catalog.py
+dotnet build src/Shalujianta.Bindings          # Python env 需要
 python -m pytest
 dotnet test src/Shalujianta.Sim.Tests/Shalujianta.Sim.Tests.csproj
+# 随机 rollout(Phase-1 DoD 冒烟)
+$env:PYTHONPATH="python"; python -m shalujianta.tools.random_rollout --slice v0 --n 10000
 ```
 
 GitHub Actions 工作流源文件在 `tools/ci/legal.yml`。要启用线上 CI，需要给 `gh` 补 `workflow` 权限后再把该文件复制到 `.github/workflows/legal.yml`。

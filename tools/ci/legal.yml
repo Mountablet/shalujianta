@@ -40,6 +40,14 @@ jobs:
       - name: Install test deps
         run: python -m pip install -r requirements-dev.txt
 
+      - name: Setup .NET (bindings bridge tests)
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "9.0.x"
+
+      - name: Build bindings
+        run: dotnet build src/Shalujianta.Bindings --nologo
+
       - name: Dump synthetic catalog
         run: python tools/dump_catalog.py --source synthetic --out catalog/generated
 
