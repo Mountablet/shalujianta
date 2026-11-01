@@ -101,11 +101,7 @@ public static class Program
     private static Dictionary<string, object?> New(JsonElement req)
     {
         int seed = req.GetProperty("seed").GetInt32();
-        var kind = req.GetProperty("encounter").GetString() switch
-        {
-            "SingleTwoTailedRat" => SliceV0.EncounterKind.SingleRat,
-            _ => SliceV0.EncounterKind.TwoTailedRats,
-        };
+        string encounterKey = req.GetProperty("encounter").GetString()!;
         var mode = req.GetProperty("mode").GetString() == "NOSL" ? InfoMode.NoSl : InfoMode.Sl;
         int stall = req.TryGetProperty("stall_turn_limit", out var st) ? st.GetInt32() : 50;
 
@@ -116,7 +112,7 @@ public static class Program
             GameVersionString = "bindings-v0",
             StallTurnLimit = stall,
         };
-        var start = SliceV0.StarterCombat(kind);
+        var start = SliceV0.EncounterByName(encounterKey);
         if (req.TryGetProperty("player_hp", out var ph))
         {
             start.PlayerHp = ph.GetInt32(); // hallway HP carry (PR-009)

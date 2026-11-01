@@ -78,4 +78,7 @@ public struct MonsterInstance
     public int MoveHits;
     public List<PowerStack> Powers;
     public int Misc;
+
+    /// <summary>AI-private scratch that survives checkpoints (used-Roar flag, phase counters).</summary>
+    public int AiState;
 }

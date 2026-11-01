@@ -14,6 +14,10 @@ public static class PowerIds
     public const int Strength = 0x04000006;
     public const int Vulnerable = 0x04000007;
     public const int Weak = 0x04000008;
+    public const int Constrict = 0x04000009;
+    public const int Shrink = 0x0400000A;
+    public const int Slippery = 0x0400000B;
+    public const int Tangled = 0x0400000C;
 }
 
 public readonly record struct PowerStack(int CatalogId, int Amount, bool JustApplied);
@@ -94,8 +98,9 @@ public static class PowerOps
 
     /// <summary>
     /// End-of-owner-turn tick: just_applied powers only clear their flag; decayable
-    /// debuffs (Vulnerable/Weak/Frail) lose one stack and drop at zero. Matches the
-    /// STS convention that a debuff applied this turn still covers the next turn.
+    /// debuffs (Vulnerable/Weak/Frail/Tangled) lose one stack and drop at zero. Matches
+    /// the STS convention that a debuff applied this turn still covers the next turn.
+    /// Slippery is consumed on trigger; Constrict is removed when its applier dies.
     /// </summary>
     public static void TickDecay(List<PowerStack> powers)
     {
@@ -125,7 +130,7 @@ public static class PowerOps
     }
 
     private static bool IsDecayable(int catalogId) =>
-        catalogId is PowerIds.Vulnerable or PowerIds.Weak or PowerIds.Frail;
+        catalogId is PowerIds.Vulnerable or PowerIds.Weak or PowerIds.Frail or PowerIds.Tangled;
 }
 
 /// <summary>
@@ -148,6 +153,11 @@ public static class DamageMath
             d *= CombatRules.WeakMultiplier;
         }
 
+        if (PowerOps.HasPower(attacker, PowerIds.Shrink))
+        {
+            d *= CombatRules.ShrinkMultiplier;
+        }
+
         return (int)MathF.Floor(d);
     }
 
@@ -164,5 +174,6 @@ public static class DamageMath
 
     /// <summary>Debuffs an Artifact holder can absorb (Poison stored but not ticked in v0).</summary>
     public static bool IsDebuff(int catalogId) =>
-        catalogId is PowerIds.Vulnerable or PowerIds.Weak or PowerIds.Frail or PowerIds.Poison;
+        catalogId is PowerIds.Vulnerable or PowerIds.Weak or PowerIds.Frail or PowerIds.Poison
+            or PowerIds.Shrink or PowerIds.Tangled or PowerIds.Constrict or PowerIds.Slippery;
 }

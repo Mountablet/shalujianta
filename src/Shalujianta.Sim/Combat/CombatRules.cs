@@ -25,4 +25,7 @@ public static class CombatRules
     public const float VulnerableMultiplier = 1.5f;
     public const float WeakMultiplier = 0.75f;
     public const float FrailMultiplier = 0.75f;
+
+    /// <summary>Shrink (Shrinker Beetle): the debuffed unit's attacks deal 30% less.</summary>
+    public const float ShrinkMultiplier = 0.7f;
 }

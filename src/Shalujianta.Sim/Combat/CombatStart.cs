@@ -13,6 +13,9 @@ public sealed class MonsterSpawn
     /// <summary>-1 means same as Hp.</summary>
     public int MaxHp { get; init; } = -1;
 
+    /// <summary>Powers the monster enters combat with (Inklet's Slippery, Cubex's Artifact).</summary>
+    public List<PowerStack> StartingPowers { get; init; } = [];
+
     public required Func<IMonsterAi> AiFactory { get; init; }
 }
 

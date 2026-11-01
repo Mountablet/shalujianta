@@ -24,6 +24,13 @@ Slay the Spire 2 的打牌 AI：无头模拟器 + 局内策略 + 局外搜索。
 
 **官方 v0（PR-000–PR-012）至此全部落地。** 学习策略（BC/PPO）、Adapter、第二角色均为 post-v0。
 
+## 密林扩池（post-v0 第一步，先于 PR-005b 卡池）
+
+- **Overgrowth（Act 1 密林）走廊遭遇 15 场已实现**（Easy 池 4 + 普通池 11），数值取自 wiki.gg（[overgrowth_moves.json](catalog/patches/overgrowth_moves.json)）
+- 新机制：Slimed（可打状态卡，抽 1 消耗）、Shrink（攻击 -30%）、Slippery（下次损血=1）、Tangled（卡费 +1）、Constrict（回合末损血）
+- 新引擎能力：怪物初始 Power（Inklet 的 Slippery、Cubex 的 Artifact）、运行时牌生成（进弃牌堆）
+- 未实现：Ruby Raiders（5 种 Raider 随机三人组）、Fogmog 的召唤（记日志跳过）——其余遭遇见 `Overgrowth.AllEncounterKeys`
+
 已锁定：
 
 - 第一角色：**Ironclad**

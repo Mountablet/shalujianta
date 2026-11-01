@@ -31,6 +31,7 @@ public sealed class CombatWorld : ISimWorld
     private int _cardsPlayedThisTurn;
     private int _zeroCostPlaysThisTurn;
     private readonly List<int> _potionSlots = []; // catalog id per slot, 0 = empty
+    private int _generatedUuidCursor = 1_000_000; // runtime-added cards (Slimed etc.)
 
     // RewardSpec combat_v0.1 accounting (design 5.3); bridge passes it to Python.
     private float _pendingReward;
@@ -64,6 +65,7 @@ public sealed class CombatWorld : ISimWorld
     /// <summary>Catalog id per potion slot; 0 = empty (v0: 3 slots, companion targeting banned).</summary>
     public IReadOnlyList<int> PotionSlots => _potionSlots;
     public bool ShufflePending => DrawPile.Count == 0 && DiscardPile.Count > 0;
+    public int GeneratedUuidCursor => _generatedUuidCursor;
     public bool IsTerminal => _terminal;
 
     /// <summary>Terminal status once IsTerminal; StepStatus.Ok before that.</summary>
@@ -104,7 +106,7 @@ public sealed class CombatWorld : ISimWorld
         foreach (var spawn in start.Monsters)
         {
             int hp = ResolveSpawnHp(spawn);
-            Monsters.Add(new MonsterInstance
+            var monster = new MonsterInstance
             {
                 Slot = Monsters.Count,
                 CatalogId = spawn.CatalogId,
@@ -113,7 +115,13 @@ public sealed class CombatWorld : ISimWorld
                 Alive = true,
                 IntentKnown = true,
                 Powers = [],
-            });
+            };
+            foreach (var p in spawn.StartingPowers)
+            {
+                PowerOps.Apply(monster.Powers, p.CatalogId, p.Amount, p.JustApplied);
+            }
+
+            Monsters.Add(monster);
             _ais.Add(spawn.AiFactory());
         }
     }
@@ -291,7 +299,7 @@ public sealed class CombatWorld : ISimWorld
             return Illegal();
         }
 
-        int cost = card.CurrentCost;
+        int cost = EffectiveCost(card); // Tangled surcharge included
         if (cost > _energy)
         {
             return Illegal();
@@ -504,6 +512,17 @@ public sealed class CombatWorld : ISimWorld
             _pendingReward += RewardV0.PotionDump; // v0 simplification of "dump before the end"
         }
 
+        // Constrict: end-of-turn HP loss while the applier is alive (block ignored).
+        int constrict = PowerOps.GetAmount(PlayerPowers, PowerIds.Constrict);
+        if (constrict > 0)
+        {
+            LosePlayerHp(constrict);
+            if (_terminal)
+            {
+                return Complete(_terminalStatus, done: true);
+            }
+        }
+
         PowerOps.TickDecay(PlayerPowers);
         RunEnemyTurn();
         if (_terminal)
@@ -554,6 +573,7 @@ public sealed class CombatWorld : ISimWorld
             }
 
             m.Block = 0; // monster block clears when its own turn begins
+            var move = _ais[slot].MoveFor(this, slot, m.MoveId);
             switch (m.Intent)
             {
                 case IntentId.Attack:
@@ -572,7 +592,6 @@ public sealed class CombatWorld : ISimWorld
                     m.Block += DamageMath.BlockGain(m.MoveBaseDamage, m.Powers);
                     break;
                 case IntentId.Buff or IntentId.Debuff:
-                    var move = _ais[slot].MoveFor(this, slot, m.MoveId);
                     if (move.Effect is not null)
                     {
                         move.Effect(this, slot);
@@ -584,8 +603,15 @@ public sealed class CombatWorld : ISimWorld
 
                     break;
                 case IntentId.Unknown:
-                    HookLog.NotImplemented(_config, $"monster:{m.CatalogId}:unknown_intent");
+                    HookLog.NotImplemented(_config, $"monster:{m.CatalogId}:move:{m.MoveId}");
                     break;
+            }
+
+            // Combined moves (Energy Orb, Thwack): the effect rides on top of the
+            // damage/defend above.
+            if (!_terminal && move.Effect is not null && m.Intent is IntentId.Attack or IntentId.Defend)
+            {
+                move.Effect(this, slot);
             }
 
             PowerOps.TickDecay(m.Powers);
@@ -633,7 +659,16 @@ public sealed class CombatWorld : ISimWorld
         dmg -= absorbed;
         if (dmg > 0)
         {
-            m.Hp -= dmg;
+            if (PowerOps.GetAmount(m.Powers, PowerIds.Slippery) > 0)
+            {
+                // Slippery: the next HP loss is only 1, then the stack is consumed.
+                m.Hp -= 1;
+                PowerOps.Decrement(m.Powers, PowerIds.Slippery);
+            }
+            else
+            {
+                m.Hp -= dmg;
+            }
         }
 
         if (m.Hp <= 0)
@@ -641,6 +676,10 @@ public sealed class CombatWorld : ISimWorld
             m.Hp = 0;
             m.Alive = false;
             _killedThisTurn = true;
+            // Source-linked debuffs: v0 appliers are unique per encounter, so the
+            // applier's death removes the player's Shrink/Constrict stacks.
+            PowerOps.Remove(PlayerPowers, PowerIds.Shrink);
+            PowerOps.Remove(PlayerPowers, PowerIds.Constrict);
             Log($"monster_death: slot={m.Slot} id={m.CatalogId}");
         }
 
@@ -678,6 +717,67 @@ public sealed class CombatWorld : ISimWorld
         if (amount > 0)
         {
             _playerHp = Math.Min(_playerMaxHp, _playerHp + amount);
+        }
+    }
+
+    /// <summary>Direct HP loss that ignores block and attack modifiers (Constrict).</summary>
+    public void LosePlayerHp(int amount)
+    {
+        if (amount <= 0 || _terminal)
+        {
+            return;
+        }
+
+        _playerHp = Math.Max(0, _playerHp - amount);
+        if (_playerHp == 0)
+        {
+            SetTerminal(StepStatus.TerminalLoss);
+        }
+    }
+
+    /// <summary>Card cost with Tangled surcharge; legality and payment both use this.</summary>
+    public int EffectiveCost(CardInstance card) =>
+        card.CurrentCost + PowerOps.GetAmount(PlayerPowers, PowerIds.Tangled);
+
+    /// <summary>Public draw entry for card effects (Slimed: draw 1).</summary>
+    public void DrawPlayerCards(int n) => DrawCards(n);
+
+    /// <summary>
+    /// Adds N instances of a registered card to the discard pile (Goop/Sticky Shot
+    /// shuffle Slimed there). Runtime cards get uuids from a dedicated range.
+    /// </summary>
+    public void AddCardsToDiscard(int catalogId, int count, int upgrade = 0)
+    {
+        if (!CardRegistry.TryGet(catalogId, out var def))
+        {
+            throw new InvalidOperationException($"card {catalogId} is not registered");
+        }
+
+        for (int i = 0; i < count; i++)
+        {
+            DiscardPile.Add(new CardInstance
+            {
+                CatalogId = catalogId,
+                Uuid = _generatedUuidCursor++,
+                Upgrade = upgrade,
+                Flags = def.Flags,
+                CurrentCost = def.BaseCost,
+            });
+        }
+    }
+
+    public void GainMonsterBlock(int slot, int baseBlock)
+    {
+        if (slot < 0 || slot >= Monsters.Count)
+        {
+            return;
+        }
+
+        var m = Monsters[slot];
+        if (m.Alive)
+        {
+            m.Block += DamageMath.BlockGain(baseBlock, m.Powers);
+            Monsters[slot] = m;
         }
     }
 
@@ -809,7 +909,7 @@ public sealed class CombatWorld : ISimWorld
                 continue;
             }
 
-            if (card.CurrentCost > _energy)
+            if (EffectiveCost(card) > _energy)
             {
                 continue;
             }
@@ -1114,6 +1214,7 @@ public sealed class CombatWorld : ISimWorld
             Exhaust = SnapshotCards(ExhaustPile),
             Limbo = SnapshotCards(Limbo),
             Potions = [.. _potionSlots],
+            GeneratedUuidCursor = _generatedUuidCursor,
             Monsters = [],
         };
 
@@ -1134,6 +1235,7 @@ public sealed class CombatWorld : ISimWorld
                 MoveBaseDamage = m.MoveBaseDamage,
                 MoveHits = m.MoveHits,
                 Misc = m.Misc,
+                AiState = m.AiState,
                 Powers = SnapshotPowers(m.Powers),
             });
         }
@@ -1192,6 +1294,7 @@ public sealed class CombatWorld : ISimWorld
 
         _potionSlots.Clear();
         _potionSlots.AddRange(s.Potions);
+        _generatedUuidCursor = Math.Max(_generatedUuidCursor, s.GeneratedUuidCursor);
 
         PlayerPowers.Clear();
         foreach (var p in s.PlayerPowers)
@@ -1222,6 +1325,7 @@ public sealed class CombatWorld : ISimWorld
             m.MoveBaseDamage = ms.MoveBaseDamage;
             m.MoveHits = ms.MoveHits;
             m.Misc = ms.Misc;
+            m.AiState = ms.AiState;
             m.Powers.Clear();
             foreach (var p in ms.Powers)
             {

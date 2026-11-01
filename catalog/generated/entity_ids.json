@@ -73,6 +73,17 @@
             "rarity": "Status",
             "type": "Status"
           }
+        },
+        {
+          "key": "Slimed",
+          "local_id": 6,
+          "entity_id": 16777222,
+          "summary": {
+            "name": "Slimed",
+            "cost": 1,
+            "rarity": "Status",
+            "type": "Status"
+          }
         }
       ]
     },
@@ -194,6 +205,38 @@
           "summary": {
             "name": "Weak"
           }
+        },
+        {
+          "key": "Constrict",
+          "local_id": 9,
+          "entity_id": 67108873,
+          "summary": {
+            "name": "Constrict"
+          }
+        },
+        {
+          "key": "Shrink",
+          "local_id": 10,
+          "entity_id": 67108874,
+          "summary": {
+            "name": "Shrink"
+          }
+        },
+        {
+          "key": "Slippery",
+          "local_id": 11,
+          "entity_id": 67108875,
+          "summary": {
+            "name": "Slippery"
+          }
+        },
+        {
+          "key": "Tangled",
+          "local_id": 12,
+          "entity_id": 67108876,
+          "summary": {
+            "name": "Tangled"
+          }
         }
       ]
     },
@@ -234,6 +277,126 @@
             "name": "Two-Tailed Rat",
             "hp": 12,
             "max_hp": 13
+          }
+        },
+        {
+          "key": "CubexConstruct",
+          "local_id": 2,
+          "entity_id": 117440514,
+          "summary": {
+            "name": "Cubex Construct"
+          }
+        },
+        {
+          "key": "Flyconid",
+          "local_id": 3,
+          "entity_id": 117440515,
+          "summary": {
+            "name": "Flyconid"
+          }
+        },
+        {
+          "key": "Fogmog",
+          "local_id": 4,
+          "entity_id": 117440516,
+          "summary": {
+            "name": "Fogmog"
+          }
+        },
+        {
+          "key": "FuzzyWurmCrawler",
+          "local_id": 5,
+          "entity_id": 117440517,
+          "summary": {
+            "name": "Fuzzy Wurm Crawler"
+          }
+        },
+        {
+          "key": "Inklet",
+          "local_id": 6,
+          "entity_id": 117440518,
+          "summary": {
+            "name": "Inklet"
+          }
+        },
+        {
+          "key": "LeafSlimeM",
+          "local_id": 7,
+          "entity_id": 117440519,
+          "summary": {
+            "name": "Leaf Slime (M)"
+          }
+        },
+        {
+          "key": "LeafSlimeS",
+          "local_id": 8,
+          "entity_id": 117440520,
+          "summary": {
+            "name": "Leaf Slime (S)"
+          }
+        },
+        {
+          "key": "Mawler",
+          "local_id": 9,
+          "entity_id": 117440521,
+          "summary": {
+            "name": "Mawler"
+          }
+        },
+        {
+          "key": "Nibbit",
+          "local_id": 10,
+          "entity_id": 117440522,
+          "summary": {
+            "name": "Nibbit"
+          }
+        },
+        {
+          "key": "ShrinkerBeetle",
+          "local_id": 11,
+          "entity_id": 117440523,
+          "summary": {
+            "name": "Shrinker Beetle"
+          }
+        },
+        {
+          "key": "SlitheringStrangler",
+          "local_id": 12,
+          "entity_id": 117440524,
+          "summary": {
+            "name": "Slithering Strangler"
+          }
+        },
+        {
+          "key": "SnappingJaxfruit",
+          "local_id": 13,
+          "entity_id": 117440525,
+          "summary": {
+            "name": "Snapping Jaxfruit"
+          }
+        },
+        {
+          "key": "TwigSlimeM",
+          "local_id": 14,
+          "entity_id": 117440526,
+          "summary": {
+            "name": "Twig Slime (M)"
+          }
+        },
+        {
+          "key": "TwigSlimeS",
+          "local_id": 15,
+          "entity_id": 117440527,
+          "summary": {
+            "name": "Twig Slime (S)"
+          }
+        },
+        {
+          "key": "VineShambler",
+          "local_id": 16,
+          "entity_id": 117440528,
+          "summary": {
+            "name": "Vine Shambler"
           }
         }
       ]
@@ -446,6 +609,126 @@
           "entity_id": 285212673,
           "summary": {
             "name": "Two-Tailed Rats"
+          }
+        },
+        {
+          "key": "Ov_A_Lone_Nibbit",
+          "local_id": 2,
+          "entity_id": 285212674,
+          "summary": {
+            "name": "A Lone Nibbit"
+          }
+        },
+        {
+          "key": "Ov_A_Pair_of_Nibbits",
+          "local_id": 3,
+          "entity_id": 285212675,
+          "summary": {
+            "name": "A Pair of Nibbits"
+          }
+        },
+        {
+          "key": "Ov_Cubex_Construct",
+          "local_id": 4,
+          "entity_id": 285212676,
+          "summary": {
+            "name": "Cubex Construct"
+          }
+        },
+        {
+          "key": "Ov_Fogmog",
+          "local_id": 5,
+          "entity_id": 285212677,
+          "summary": {
+            "name": "Fogmog"
+          }
+        },
+        {
+          "key": "Ov_Fuzzy_Wurm_Crawler",
+          "local_id": 6,
+          "entity_id": 285212678,
+          "summary": {
+            "name": "Fuzzy Wurm Crawler"
+          }
+        },
+        {
+          "key": "Ov_Group_of_Slimes",
+          "local_id": 7,
+          "entity_id": 285212679,
+          "summary": {
+            "name": "Group of Slimes"
+          }
+        },
+        {
+          "key": "Ov_Inklets",
+          "local_id": 8,
+          "entity_id": 285212680,
+          "summary": {
+            "name": "Inklets"
+          }
+        },
+        {
+          "key": "Ov_Mawler",
+          "local_id": 9,
+          "entity_id": 285212681,
+          "summary": {
+            "name": "Mawler"
+          }
+        },
+        {
+          "key": "Ov_Overgrowth_Crawlers",
+          "local_id": 10,
+          "entity_id": 285212682,
+          "summary": {
+            "name": "Overgrowth Crawlers"
+          }
+        },
+        {
+          "key": "Ov_Overgrowth_Flora",
+          "local_id": 11,
+          "entity_id": 285212683,
+          "summary": {
+            "name": "Overgrowth Flora"
+          }
+        },
+        {
+          "key": "Ov_Shrink_Slime",
+          "local_id": 12,
+          "entity_id": 285212684,
+          "summary": {
+            "name": "Shroom and Slime"
+          }
+        },
+        {
+          "key": "Ov_Shrinker_Beetle",
+          "local_id": 13,
+          "entity_id": 285212685,
+          "summary": {
+            "name": "Shrinker Beetle"
+          }
+        },
+        {
+          "key": "Ov_Strangler_and_Friend",
+          "local_id": 14,
+          "entity_id": 285212686,
+          "summary": {
+            "name": "Strangler and Friend"
+          }
+        },
+        {
+          "key": "Ov_Swarm_of_Slimes",
+          "local_id": 15,
+          "entity_id": 285212687,
+          "summary": {
+            "name": "Swarm of Slimes"
+          }
+        },
+        {
+          "key": "Ov_Vine_Shambler",
+          "local_id": 16,
+          "entity_id": 285212688,
+          "summary": {
+            "name": "Vine Shambler"
           }
         }
       ]

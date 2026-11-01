@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "name": "overgrowth_moves",
+  "source": "slaythespire.wiki.gg Slay_the_Spire_2 pages, checked 2026-11-01 (Nibbit / Slimes / Shrinker_Beetle / Fuzzy_Wurm_Crawler / Inklet / Mawler / Flyconid / Snapping_Jaxfruit / Vine_Shambler / Fogmog / Cubex_Construct / Slithering_Strangler / Overgrowth / Slimed). Wiki numbers, NOT decompiled values; PR-014 parity must re-verify every entry against the local sts2.dll. Ascension 8+ scalings are recorded in the wiki but not implemented (v0 is A0).",
+  "catalog_version": "synthetic-v0",
+  "mechanics": {
+    "Slimed": "1-cost Colorless Status, 'Draw 1 card. Exhaust.' - playable, shuffled into the DISCARD pile by slimes",
+    "Shrink": "the debuffed unit's attacks deal 30% less damage; removed when the applier dies",
+    "Slippery": "the holder's next HP loss is only 1, then the stack is consumed (Inklet starts with 1)",
+    "Tangled": "v0 approximation: a decaying player debuff that surcharges every card by +1 energy per stack",
+    "Constrict": "take X damage at the end of your turn while the applier is alive (block ignored); removed when the applier dies"
+  },
+  "Nibbit": {
+    "hp_min": 42, "hp_max": 46,
+    "moves": { "Butt": 12, "HesitantSlice_damage": 6, "HesitantSlice_block": 5, "Hiss_strength": 2 },
+    "ai": "strict rotation Butt -> Hesitant Slice -> Hiss; solo opens Butt; pair front opens Hesitant Slice, back opens Hiss"
+  },
+  "LeafSlime": {
+    "S": { "hp_min": 11, "hp_max": 15, "moves": { "Tackle": 3, "Goop_slimed": 1 }, "ai": "random no-repeat (= alternation)" },
+    "M": { "hp_min": 32, "hp_max": 35, "moves": { "ClumpShot": 8, "StickyShot_slimed": 2 }, "ai": "opens Sticky Shot, then alternates Clump Shot / Sticky Shot" }
+  },
+  "TwigSlime": {
+    "S": { "hp_min": 7, "hp_max": 11, "moves": { "Tackle": 4 }, "ai": "Tackle every turn" },
+    "M": { "hp_min": 26, "hp_max": 28, "moves": { "Chomp": 11, "StickyShot_slimed": 1 }, "ai": "opens Sticky Shot, then 67% Chomp / 33% Sticky, no Sticky twice" }
+  },
+  "ShrinkerBeetle": { "hp_min": 38, "hp_max": 40, "moves": { "Chomp": 7, "Stomp": 13, "Shrinker": 1 }, "ai": "opens Shrinker, then alternates Chomp / Stomp" },
+  "FuzzyWurmCrawler": { "hp_min": 55, "hp_max": 57, "moves": { "AcidGoop": 4, "Inhale_strength": 7 }, "ai": "fixed cycle Acid Goop -> Inhale -> Acid Goop" },
+  "Inklet": {
+    "hp_min": 11, "hp_max": 17, "starting_powers": { "Slippery": 1 },
+    "moves": { "Jab": 3, "Whirlwind_damage": 2, "Whirlwind_hits": 3, "PiercingGaze": 10 },
+    "ai": "outer two open Jab, middle opens Whirlwind; then alternate Jab with an even coin flip between Piercing Gaze and Whirlwind"
+  },
+  "Mawler": {
+    "hp": 72,
+    "moves": { "RipAndTear": 14, "Roar_vulnerable": 3, "Claw_damage": 4, "Claw_hits": 2 },
+    "ai": "opens Claw, then equal random no-repeat; Roar once per fight"
+  },
+  "Flyconid": {
+    "hp_min": 47, "hp_max": 49,
+    "moves": { "WeakeningSpores_vulnerable": 2, "FrailSpores_damage": 8, "FrailSpores_frail": 2, "Smash": 11 },
+    "ai": "turn 1: 2/3 Frail Spores, 1/3 Smash; then 3/6 Weakening, 2/6 Frail Spores, 1/6 Smash; no-repeat"
+  },
+  "SnappingJaxfruit": { "hp_min": 31, "hp_max": 33, "moves": { "EnergyOrb_damage": 3, "EnergyOrb_strength": 2 }, "ai": "Energy Orb every turn" },
+  "VineShambler": { "hp": 61, "moves": { "Swipe_damage": 6, "Swipe_hits": 2, "GraspingVines_damage": 8, "GraspingVines_tangled": 1, "Chomp": 16 }, "ai": "fixed cycle Swipe -> Grasping Vines -> Chomp" },
+  "Fogmog": {
+    "hp": 74,
+    "moves": { "Thwack_damage": 8, "Thwack_strength": 1, "Headbutt": 14 },
+    "ai": "opens Illusory Spores (summon: NOT implemented in v0, logged no-op), then Thwack, then alternates Thwack / Headbutt",
+    "excluded_in_v0": [{ "key": "EyeWithTeeth", "reason": "summon + revive + Dazed shuffle out of v0 scope" }]
+  },
+  "CubexConstruct": {
+    "hp": 65, "starting_powers": { "Artifact": 1 },
+    "moves": { "ChargeUp_strength": 2, "RepeaterBlast_damage": 7, "RepeaterBlast_strength": 2, "ExpelBlast_damage": 5, "ExpelBlast_hits": 2 },
+    "ai": "Charge Up, then repeat Repeater Blast -> Repeater Blast -> Expel Blast"
+  },
+  "SlitheringStrangler": {
+    "hp_min": 53, "hp_max": 55,
+    "moves": { "Constrict_stacks": 3, "Thwack_damage": 7, "Thwack_block": 5, "Lash": 12 },
+    "ai": "opens Constrict, then alternates Constrict with a 50/50 Thwack / Lash"
+  },
+  "encounters": {
+    "implemented": [
+      "Ov_A_Lone_Nibbit", "Ov_Group_of_Slimes", "Ov_Shrinker_Beetle", "Ov_Fuzzy_Wurm_Crawler",
+      "Ov_Inklets", "Ov_Mawler", "Ov_A_Pair_of_Nibbits", "Ov_Swarm_of_Slimes",
+      "Ov_Shrink_Slime", "Ov_Overgrowth_Flora", "Ov_Fogmog", "Ov_Cubex_Construct",
+      "Ov_Vine_Shambler", "Ov_Overgrowth_Crawlers", "Ov_Strangler_and_Friend"
+    ],
+    "v0_simplifications": [
+      "Shroom and Slime fixes the random medium slime to Leaf Slime (M)",
+      "Strangler and Friend fixes the friend to Snapping Jaxfruit",
+      "Fogmog's summon is a logged no-op turn"
+    ],
+    "not_implemented": ["Ruby Raiders (5 raider types, random trio of 3)"]
+  }
+}

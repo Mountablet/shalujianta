@@ -114,6 +114,7 @@ public sealed class CombatSnapshot
     public List<CardSnapshot> Exhaust { get; set; } = [];
     public List<CardSnapshot> Limbo { get; set; } = [];
     public List<int> Potions { get; set; } = [];
+    public int GeneratedUuidCursor { get; set; } = 1_000_000;
     public List<MonsterSnapshot> Monsters { get; set; } = [];
 }
 
@@ -149,5 +150,6 @@ public sealed class MonsterSnapshot
     public int MoveBaseDamage { get; set; }
     public int MoveHits { get; set; }
     public int Misc { get; set; }
+    public int AiState { get; set; }
     public List<PowerSnapshot> Powers { get; set; } = [];
 }

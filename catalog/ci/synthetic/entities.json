@@ -1,14 +1,15 @@
 {
   "catalog_version": "synthetic-v0",
   "game_version_string": "synthetic",
-  "note": "CI-only fake catalog. Not live Codex. SliceV0 names plus a few extras.",
+  "note": "CI-only fake catalog. Not live Codex. SliceV0 names plus Overgrowth (密林) hallway pool additions. Ids are append-only: existing keys never renumber.",
   "namespaces": {
     "CARD": [
       {"key": "Strike_R", "name": "Strike", "cost": 1, "rarity": "Basic", "type": "Attack"},
       {"key": "Defend_R", "name": "Defend", "cost": 1, "rarity": "Basic", "type": "Skill"},
       {"key": "Bash", "name": "Bash", "cost": 2, "rarity": "Basic", "type": "Attack"},
       {"key": "Wound", "name": "Wound", "cost": -1, "rarity": "Status", "type": "Status"},
-      {"key": "AscendersBane", "name": "Ascender's Bane", "cost": -1, "rarity": "Curse", "type": "Curse"}
+      {"key": "AscendersBane", "name": "Ascender's Bane", "cost": -1, "rarity": "Curse", "type": "Curse"},
+      {"key": "Slimed", "name": "Slimed", "cost": 1, "rarity": "Status", "type": "Status"}
     ],
     "RELIC": [
       {"key": "BurningBlood", "name": "Burning Blood"}
@@ -25,10 +26,29 @@
       {"key": "Frail", "name": "Frail"},
       {"key": "Poison", "name": "Poison"},
       {"key": "Artifact", "name": "Artifact"},
-      {"key": "Buffer", "name": "Buffer"}
+      {"key": "Buffer", "name": "Buffer"},
+      {"key": "Constrict", "name": "Constrict"},
+      {"key": "Shrink", "name": "Shrink"},
+      {"key": "Slippery", "name": "Slippery"},
+      {"key": "Tangled", "name": "Tangled"}
     ],
     "MONSTER": [
-      {"key": "TwoTailedRat", "name": "Two-Tailed Rat", "hp": 12, "max_hp": 13}
+      {"key": "TwoTailedRat", "name": "Two-Tailed Rat", "hp": 12, "max_hp": 13},
+      {"key": "CubexConstruct", "name": "Cubex Construct"},
+      {"key": "Fogmog", "name": "Fogmog"},
+      {"key": "Flyconid", "name": "Flyconid"},
+      {"key": "FuzzyWurmCrawler", "name": "Fuzzy Wurm Crawler"},
+      {"key": "Inklet", "name": "Inklet"},
+      {"key": "LeafSlimeM", "name": "Leaf Slime (M)"},
+      {"key": "LeafSlimeS", "name": "Leaf Slime (S)"},
+      {"key": "Mawler", "name": "Mawler"},
+      {"key": "Nibbit", "name": "Nibbit"},
+      {"key": "ShrinkerBeetle", "name": "Shrinker Beetle"},
+      {"key": "SlitheringStrangler", "name": "Slithering Strangler"},
+      {"key": "SnappingJaxfruit", "name": "Snapping Jaxfruit"},
+      {"key": "TwigSlimeM", "name": "Twig Slime (M)"},
+      {"key": "TwigSlimeS", "name": "Twig Slime (S)"},
+      {"key": "VineShambler", "name": "Vine Shambler"}
     ],
     "INTENT": [
       {"key": "Attack", "name": "Attack"},
@@ -38,7 +58,22 @@
       {"key": "Unknown", "name": "Unknown"}
     ],
     "ENCOUNTER": [
-      {"key": "Act1_TwoTailedRats", "name": "Two-Tailed Rats"}
+      {"key": "Act1_TwoTailedRats", "name": "Two-Tailed Rats"},
+      {"key": "Ov_A_Lone_Nibbit", "name": "A Lone Nibbit"},
+      {"key": "Ov_A_Pair_of_Nibbits", "name": "A Pair of Nibbits"},
+      {"key": "Ov_Group_of_Slimes", "name": "Group of Slimes"},
+      {"key": "Ov_Swarm_of_Slimes", "name": "Swarm of Slimes"},
+      {"key": "Ov_Shrinker_Beetle", "name": "Shrinker Beetle"},
+      {"key": "Ov_Fuzzy_Wurm_Crawler", "name": "Fuzzy Wurm Crawler"},
+      {"key": "Ov_Overgrowth_Crawlers", "name": "Overgrowth Crawlers"},
+      {"key": "Ov_Inklets", "name": "Inklets"},
+      {"key": "Ov_Mawler", "name": "Mawler"},
+      {"key": "Ov_Shrink_Slime", "name": "Shroom and Slime"},
+      {"key": "Ov_Overgrowth_Flora", "name": "Overgrowth Flora"},
+      {"key": "Ov_Fogmog", "name": "Fogmog"},
+      {"key": "Ov_Cubex_Construct", "name": "Cubex Construct"},
+      {"key": "Ov_Vine_Shambler", "name": "Vine Shambler"},
+      {"key": "Ov_Strangler_and_Friend", "name": "Strangler and Friend"}
     ],
     "KEYWORD": [
       {"key": "Exhaust"},

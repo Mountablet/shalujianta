@@ -28,6 +28,7 @@ public static class SliceV0
         Defend.Register();
         Bash.Register();
         V0Potions.Register();
+        Overgrowth.Register(); // Slimed status card (Overgrowth slimes shuffle it in)
         RelicRegistry.Register(RelicIds.BurningBlood, new BurningBlood());
     }
 
@@ -64,6 +65,39 @@ public static class SliceV0
                 EncounterKind.SingleRat => Encounters.SingleTwoTailedRat(),
                 _ => Encounters.SingleTwoTailedRat(),
             },
+        };
+    }
+
+    /// <summary>
+    /// Starter combat for any registered encounter key (Underdocks + Overgrowth).
+    /// Unknown keys throw so the bridge never silently runs an empty board.
+    /// </summary>
+    public static CombatStart EncounterByName(string key)
+    {
+        Register();
+        if (key == "SingleTwoTailedRat")
+        {
+            return StarterCombat(EncounterKind.SingleRat);
+        }
+
+        if (key == "Act1_TwoTailedRats")
+        {
+            return StarterCombat(EncounterKind.TwoTailedRats);
+        }
+
+        if (!Overgrowth.Hallway.TryGetValue(key, out var entry))
+        {
+            throw new KeyNotFoundException($"unknown encounter key: {key}");
+        }
+
+        return new CombatStart
+        {
+            PlayerMaxHp = 80,
+            MaxEnergy = 3,
+            EncounterId = entry.EncounterId,
+            Deck = IroncladStarterDeck(),
+            RelicIds = [RelicIds.BurningBlood],
+            Monsters = entry.Build(),
         };
     }
 }
