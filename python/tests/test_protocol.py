@@ -26,18 +26,28 @@ from shalujianta.protocol.codec import (
     project_observation,
 )
 from shalujianta.protocol.constants import (
+    BOSS_RELIC_BASE,
+    CARD_REWARD_BASE,
+    CHOOSE_BASE,
     COMBAT_FLAT_END,
     DISCARD_POTION_BASE,
     END_TURN_SLOT,
     EVENT_BASE,
     FLAT_SIZE,
+    MAP_SELECT_BASE,
+    MAX_HAND,
+    MAX_POTIONS,
+    MAX_TARGETS,
     PLAY_CARD_BASE,
     PLAY_CARD_COUNT,
+    PROCEED_SLOT,
+    REST_BASE,
     SCHEMA_VERSION,
     SHOP_BASE,
     SHOP_BUY_COUNT,
     SHOP_LEAVE_SLOT,
     SHOP_REMOVE_SLOT,
+    SKIP_SLOT,
     TARGET_ALL_ENEMIES,
     TARGET_MONSTER,
     TARGET_NONE,
@@ -291,7 +301,25 @@ def test_csharp_flatten_constants_match_python() -> None:
         return int(match.group(1))
 
     assert const("Size") == FLAT_SIZE
+    assert const("MaxHand") == MAX_HAND
+    assert const("MaxTargets") == MAX_TARGETS
+    assert const("MaxPotions") == MAX_POTIONS
+    assert const("PlayCardBase") == PLAY_CARD_BASE
     assert const("PlayCardCount") == PLAY_CARD_COUNT
+    assert const("UsePotionBase") == USE_POTION_BASE
     assert const("UsePotionCount") == USE_POTION_COUNT
+    assert const("DiscardPotionBase") == DISCARD_POTION_BASE
     assert const("EndTurnSlot") == END_TURN_SLOT
     assert const("CombatFlatEnd") == COMBAT_FLAT_END
+    assert const("MapSelectBase") == MAP_SELECT_BASE
+    assert const("CardRewardBase") == CARD_REWARD_BASE
+    assert const("RestBase") == REST_BASE
+    assert const("ShopBase") == SHOP_BASE
+    assert const("ShopBuyCount") == SHOP_BUY_COUNT
+    assert const("ShopRemoveSlot") == SHOP_REMOVE_SLOT
+    assert const("ShopLeaveSlot") == SHOP_LEAVE_SLOT
+    assert const("EventBase") == EVENT_BASE
+    assert const("BossRelicBase") == BOSS_RELIC_BASE
+    assert const("ChooseBase") == CHOOSE_BASE
+    assert const("ProceedSlot") == PROCEED_SLOT
+    assert const("SkipSlot") == SKIP_SLOT

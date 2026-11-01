@@ -23,6 +23,7 @@ internal static class TestCards
     internal const int NoApply = (1 << 24) | 709;      // def registered, Apply null
     internal const int Unplayable = (1 << 24) | 710;   // Unplayable flag
     internal const int InnateStrike = (1 << 24) | 711; // 6 dmg, innate, cost 1
+    internal const int XCostBlock = (1 << 24) | 712;   // X-cost block, banned in v0
     internal const int M1 = (7 << 24) | 700;
     internal const int M2 = (7 << 24) | 701;
 

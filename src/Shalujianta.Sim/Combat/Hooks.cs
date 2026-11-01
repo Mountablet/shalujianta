@@ -38,11 +38,24 @@ public interface IRelicHooks
 
 public static class RelicRegistry
 {
+    private static readonly object Gate = new();
     private static readonly Dictionary<int, IRelicHooks> Hooks = [];
 
-    public static void Register(int catalogId, IRelicHooks hooks) => Hooks[catalogId] = hooks;
+    public static void Register(int catalogId, IRelicHooks hooks)
+    {
+        lock (Gate)
+        {
+            Hooks[catalogId] = hooks;
+        }
+    }
 
-    public static bool TryGet(int catalogId, out IRelicHooks hooks) => Hooks.TryGetValue(catalogId, out hooks!);
+    public static bool TryGet(int catalogId, out IRelicHooks hooks)
+    {
+        lock (Gate)
+        {
+            return Hooks.TryGetValue(catalogId, out hooks!);
+        }
+    }
 }
 
 public static class HookLog

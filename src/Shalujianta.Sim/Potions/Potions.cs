@@ -12,11 +12,24 @@ public readonly record struct PotionDef(int CatalogId, bool RequiresTarget, Poti
 
 public static class PotionRegistry
 {
+    private static readonly object Gate = new();
     private static readonly Dictionary<int, PotionDef> Defs = [];
 
-    public static void Register(PotionDef def) => Defs[def.CatalogId] = def;
+    public static void Register(PotionDef def)
+    {
+        lock (Gate)
+        {
+            Defs[def.CatalogId] = def;
+        }
+    }
 
-    public static bool TryGet(int catalogId, out PotionDef def) => Defs.TryGetValue(catalogId, out def!);
+    public static bool TryGet(int catalogId, out PotionDef def)
+    {
+        lock (Gate)
+        {
+            return Defs.TryGetValue(catalogId, out def!);
+        }
+    }
 }
 
 /// <summary>

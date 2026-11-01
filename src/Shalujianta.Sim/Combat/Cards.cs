@@ -41,11 +41,24 @@ public readonly record struct CardDef(
 /// </summary>
 public static class CardRegistry
 {
+    private static readonly object Gate = new();
     private static readonly Dictionary<int, CardDef> Defs = [];
 
-    public static void Register(CardDef def) => Defs[def.CatalogId] = def;
+    public static void Register(CardDef def)
+    {
+        lock (Gate)
+        {
+            Defs[def.CatalogId] = def;
+        }
+    }
 
-    public static bool TryGet(int catalogId, out CardDef def) => Defs.TryGetValue(catalogId, out def);
+    public static bool TryGet(int catalogId, out CardDef def)
+    {
+        lock (Gate)
+        {
+            return Defs.TryGetValue(catalogId, out def);
+        }
+    }
 
     public static IReadOnlyDictionary<int, CardDef> All => Defs;
 }
