@@ -29,6 +29,12 @@ public sealed class CombatStart
     public int PlayerHp { get; init; } = -1;
     public int PlayerMaxHp { get; init; } = 80;
     public int MaxEnergy { get; init; } = CombatRules.DefaultMaxEnergy;
+
+    /// <summary>Potion slot count (SliceV0: 3, starting empty).</summary>
+    public int PotionSlots { get; init; } = 3;
+
+    /// <summary>Catalog ids filling the first slots at combat start; 0 rows are skipped.</summary>
+    public List<int> StartingPotions { get; init; } = [];
     public List<CardInstance> Deck { get; init; } = [];
     public List<MonsterSpawn> Monsters { get; init; } = [];
     public List<int> RelicIds { get; init; } = [];

@@ -113,6 +113,7 @@ public sealed class CombatSnapshot
     public List<CardSnapshot> Discard { get; set; } = [];
     public List<CardSnapshot> Exhaust { get; set; } = [];
     public List<CardSnapshot> Limbo { get; set; } = [];
+    public List<int> Potions { get; set; } = [];
     public List<MonsterSnapshot> Monsters { get; set; } = [];
 }
 

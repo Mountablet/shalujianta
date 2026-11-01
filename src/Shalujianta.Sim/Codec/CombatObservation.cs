@@ -25,6 +25,7 @@ public sealed class CombatObservation
     public int ExhaustCount { get; init; }
     public int LimboCount { get; init; }
     public List<BagCount> DrawBagCounts { get; init; } = [];
+    public List<int> Potions { get; init; } = [];
     public bool ShufflePending { get; init; }
 }
 

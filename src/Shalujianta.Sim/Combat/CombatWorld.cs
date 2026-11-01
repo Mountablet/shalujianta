@@ -1,5 +1,6 @@
 using Shalujianta.Sim.Codec;
 using Shalujianta.Sim.Core;
+using Shalujianta.Sim.Potions;
 
 namespace Shalujianta.Sim.Combat;
 
@@ -29,6 +30,7 @@ public sealed class CombatWorld : ISimWorld
     private int _timesDamagedThisCombat;
     private int _cardsPlayedThisTurn;
     private int _zeroCostPlaysThisTurn;
+    private readonly List<int> _potionSlots = []; // catalog id per slot, 0 = empty
 
     // Zones are public for test/golden-fixture wiring; the kernel mutates them
     // through its own paths. Struct instances: no per-card heap allocation.
@@ -51,6 +53,9 @@ public sealed class CombatWorld : ISimWorld
     public int MaxEnergy => _maxEnergy;
     public int CardsPlayedThisTurn => _cardsPlayedThisTurn;
     public int ZeroCostPlaysThisTurn => _zeroCostPlaysThisTurn;
+
+    /// <summary>Catalog id per potion slot; 0 = empty (v0: 3 slots, companion targeting banned).</summary>
+    public IReadOnlyList<int> PotionSlots => _potionSlots;
     public bool ShufflePending => DrawPile.Count == 0 && DiscardPile.Count > 0;
     public bool IsTerminal => _terminal;
 
@@ -74,6 +79,20 @@ public sealed class CombatWorld : ISimWorld
         _playerHp = start.PlayerHp < 0 ? start.PlayerMaxHp : start.PlayerHp;
         _maxEnergy = start.MaxEnergy;
         _energy = start.MaxEnergy;
+
+        for (int i = 0; i < start.PotionSlots; i++)
+        {
+            _potionSlots.Add(0);
+        }
+
+        int potionCursor = 0;
+        foreach (int potionId in start.StartingPotions)
+        {
+            if (potionId != 0 && potionCursor < _potionSlots.Count)
+            {
+                _potionSlots[potionCursor++] = potionId;
+            }
+        }
 
         foreach (var spawn in start.Monsters)
         {
@@ -199,6 +218,8 @@ public sealed class CombatWorld : ISimWorld
         {
             Verb.PlayCard => StepPlayCard(action),
             Verb.EndTurn => StepEndTurn(),
+            Verb.UsePotion => StepUsePotion(action),
+            Verb.DiscardPotion => StepDiscardPotion(action),
             Verb.Noop or Verb.Wait or Verb.State => new StepResult(StepStatus.Ok, 0f, false),
             _ => LogAndReject(action.Verb),
         };
@@ -299,6 +320,103 @@ public sealed class CombatWorld : ISimWorld
         }
 
         return new StepResult(StepStatus.Ok, 0f, false);
+    }
+
+    private StepResult StepUsePotion(in Action action)
+    {
+        if (_phase != CombatPhase.Player)
+        {
+            return Illegal();
+        }
+
+        int slot = action.PotionSlot;
+        if (slot < 0 || slot >= _potionSlots.Count)
+        {
+            return Illegal();
+        }
+
+        int potionId = _potionSlots[slot];
+        if (potionId == 0)
+        {
+            return Illegal();
+        }
+
+        if (!PotionRegistry.TryGet(potionId, out var def))
+        {
+            return Illegal();
+        }
+
+        if (def.Apply is null)
+        {
+            HookLog.NotImplemented(_config, $"potion:{potionId}:Apply");
+            return Illegal();
+        }
+
+        if (!PotionTargetIsValid(def.RequiresTarget, action.Target))
+        {
+            return Illegal();
+        }
+
+        // Potions cost no energy and do not count as card plays.
+        def.Apply(this, action.Target);
+        _potionSlots[slot] = 0;
+
+        if (_terminal)
+        {
+            return new StepResult(_terminalStatus, 0f, true);
+        }
+
+        if (AllMonstersDead())
+        {
+            SetTerminal(StepStatus.TerminalWin);
+            return new StepResult(StepStatus.TerminalWin, 0f, true);
+        }
+
+        return new StepResult(StepStatus.Ok, 0f, false);
+    }
+
+    private StepResult StepDiscardPotion(in Action action)
+    {
+        if (_phase != CombatPhase.Player)
+        {
+            return Illegal();
+        }
+
+        int slot = action.PotionSlot;
+        if (slot < 0 || slot >= _potionSlots.Count || _potionSlots[slot] == 0)
+        {
+            return Illegal();
+        }
+
+        _potionSlots[slot] = 0;
+        return new StepResult(StepStatus.Ok, 0f, false);
+    }
+
+    /// <summary>Fills the first empty potion slot (rewards use the implicit pickup path post-v0).</summary>
+    public bool AddPotion(int catalogId)
+    {
+        int slot = _potionSlots.IndexOf(0);
+        if (slot < 0)
+        {
+            Log("potion_slots_full: pickup refused");
+            return false;
+        }
+
+        _potionSlots[slot] = catalogId;
+        return true;
+    }
+
+    private bool PotionTargetIsValid(bool requiresTarget, TargetRef target)
+    {
+        if (!requiresTarget)
+        {
+            return target.Kind == TargetKind.None;
+        }
+
+        return target.Kind == TargetKind.Monster
+               && target.Index >= 0
+               && target.Index < Monsters.Count
+               && Monsters[target.Index].Alive;
     }
 
     /// <summary>Move a resolved card out of limbo into exhaust/discard unless Apply consumed it.</summary>
@@ -666,6 +784,46 @@ public sealed class CombatWorld : ISimWorld
             }
         }
 
+        bool anyPotion = false;
+        bool anyDiscard = false;
+        for (int s = 0; s < _potionSlots.Count && s < ActionFlatten.MaxPotions; s++)
+        {
+            int potionId = _potionSlots[s];
+            if (potionId == 0)
+            {
+                continue;
+            }
+
+            mask.PotionDiscardable[s] = true;
+            anyDiscard = true;
+            if (!PotionRegistry.TryGet(potionId, out var def) || def.Apply is null)
+            {
+                continue;
+            }
+
+            mask.PotionUsable[s] = true;
+            anyPotion = true;
+            if (def.RequiresTarget)
+            {
+                for (int m = 0; m < Monsters.Count && m < CombatRules.MaxMonsters; m++)
+                {
+                    if (Monsters[m].Alive)
+                    {
+                        mask.PotionTargets[s][1 + m] = true;
+                    }
+                }
+            }
+            else
+            {
+                mask.PotionTargets[s][0] = true;
+            }
+
+            // Slots 7/8 stay false: no player-target potions in v0; companion
+            // targeting is permanently masked off (design 4.1.1 / PR-006 gate).
+        }
+
+        mask.VerbsAllowed[(int)Verb.UsePotion] = anyPotion;
+        mask.VerbsAllowed[(int)Verb.DiscardPotion] = anyDiscard;
         mask.VerbsAllowed[(int)Verb.PlayCard] = anyPlay;
         mask.VerbsAllowed[(int)Verb.EndTurn] = true;
         mask.PopulateFlat();
@@ -766,6 +924,7 @@ public sealed class CombatWorld : ISimWorld
             ExhaustCount = ExhaustPile.Count,
             LimboCount = Limbo.Count,
             DrawBagCounts = bagList,
+            Potions = [.. _potionSlots],
             ShufflePending = ShufflePending,
         };
     }
@@ -832,6 +991,7 @@ public sealed class CombatWorld : ISimWorld
             Discard = SnapshotCards(DiscardPile),
             Exhaust = SnapshotCards(ExhaustPile),
             Limbo = SnapshotCards(Limbo),
+            Potions = [.. _potionSlots],
             Monsters = [],
         };
 
@@ -907,6 +1067,9 @@ public sealed class CombatWorld : ISimWorld
         RestoreCards(DiscardPile, s.Discard);
         RestoreCards(ExhaustPile, s.Exhaust);
         RestoreCards(Limbo, s.Limbo);
+
+        _potionSlots.Clear();
+        _potionSlots.AddRange(s.Potions);
 
         PlayerPowers.Clear();
         foreach (var p in s.PlayerPowers)

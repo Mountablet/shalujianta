@@ -2,6 +2,7 @@ using Shalujianta.Sim.Catalog;
 using Shalujianta.Sim.Cards.Ironclad;
 using Shalujianta.Sim.Combat;
 using Shalujianta.Sim.Monsters;
+using Shalujianta.Sim.Potions;
 using Shalujianta.Sim.Relics;
 
 namespace Shalujianta.Sim.Content;
@@ -26,6 +27,7 @@ public static class SliceV0
         Strike.Register();
         Defend.Register();
         Bash.Register();
+        V0Potions.Register();
         RelicRegistry.Register(RelicIds.BurningBlood, new BurningBlood());
     }
 
